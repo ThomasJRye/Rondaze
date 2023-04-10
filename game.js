@@ -1,7 +1,13 @@
 // Initialize canvas
-const canvas = document.getElementById("canvas");
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext("2d");
 
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 // Set up the planet
 const planet = {
   x: canvas.width / 2,
@@ -18,18 +24,24 @@ const spacecraft = {
     velocity_x: 1,
     velocity_y: 0,
     angle: 0,
+    angularVelocity: 0, // Add angular velocity property
+
   };
+
+let arrowUpPressed = false;
 
 // Add keyboard controls
 document.addEventListener("keydown", (event) => {
   switch (event.code) {
     case "ArrowLeft":
-      spacecraft.angle -= 0.1;
-      break;
-    case "ArrowRight":
-      spacecraft.angle += 0.1;
+    case "ArrowLeft":
+        spacecraft.angularVelocity -= 0.005; // Change angular velocity instead of angle
+        break;
+        case "ArrowRight":
+        spacecraft.angularVelocity += 0.005; // Change angular velocity instead of angle
       break;
     case "ArrowUp":
+        arrowUpPressed = true;
         spacecraft.velocity_x += Math.sin(spacecraft.angle)*0.1;
         spacecraft.velocity_y -= Math.cos(spacecraft.angle)*0.1;
       break;
@@ -38,6 +50,14 @@ document.addEventListener("keydown", (event) => {
       break;
   }
 });
+
+document.addEventListener("keyup", (event) => {
+    switch (event.code) {
+      case "ArrowUp":
+        arrowUpPressed = false;
+        break;
+    }
+  });
 
 // Draw the planet and spacecraft
 function draw() {
@@ -50,12 +70,21 @@ function draw() {
     ctx.fillStyle = "blue";
     ctx.fill();
   
-    // // Draw the spacecraft, it should be a black tall triange
-    // ctx.beginPath();
-    // ctx.
-    // ctx.arc(spacecraft.x, spacecraft.y, spacecraft.radius, 0, Math.PI * 2);
-    // ctx.fillStyle = "black"; // Set fillStyle to black
-    // ctx.fill();
+
+
+    if (arrowUpPressed) {
+        ctx.save();
+        ctx.translate(spacecraft.x, spacecraft.y);
+        ctx.rotate(spacecraft.angle);
+        ctx.beginPath();
+        ctx.moveTo(-spacecraft.radius, spacecraft.radius + 10);
+        ctx.lineTo(0, spacecraft.radius + 30);
+        ctx.lineTo(spacecraft.radius, spacecraft.radius + 10);
+        ctx.closePath();
+        ctx.fillStyle = "orange";
+        ctx.fill();
+        ctx.restore();
+      }
 
     ctx.save(); // Save the current state of the canvas 
     ctx.translate(spacecraft.x, spacecraft.y); 
@@ -71,12 +100,27 @@ function draw() {
     // Draw a line to the bottom right vertex 
     ctx.closePath(); 
     // Close the path 
-    ctx.fillStyle = "black"; // Set fillStyle to black
+    ctx.fillStyle = "maroon"; // Set fillStyle to maroon
     // Set fillStyle to black 
     ctx.fill(); // Fill the triangle 
     ctx.restore(); // Restore the previous state of the canvas
   }
   
+
+// Collision detection function
+function areCirclesColliding(circle1, circle2) {
+    const dx = circle1.x - circle2.x;
+    const dy = circle1.y - circle2.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const sumOfRadii = circle1.radius + circle2.radius;
+
+    return distance <= sumOfRadii;
+}
+
+// Spacecraft outside bounds detection function
+function isSpacecraftOutsideBounds(spacecraft) {
+    return spacecraft.x < 0 || spacecraft.x > canvas.width || spacecraft.y < 0 || spacecraft.y > canvas.height;
+}
 
 // Update the spacecraft's position and momentum
 function update() {
@@ -94,6 +138,12 @@ function update() {
     let acceleration_x = gravity*Math.cos(angle);
     let acceleration_y = gravity*Math.sin(angle);
 
+    // Update the spacecraft's angle based on its angular velocity
+    spacecraft.angle += spacecraft.angularVelocity;
+
+    // Optional: apply a damping factor to gradually reduce the angular velocity
+    spacecraft.angularVelocity *= 0.99;
+
     if (spacecraft.x > planet.x) {
         acceleration_x = -acceleration_x;
     }
@@ -104,14 +154,23 @@ function update() {
     spacecraft.velocity_x += acceleration_x;
     spacecraft.velocity_y += acceleration_y;
     
-    // console.log("x: " + spacecraft.velocity_x)
-    // console.log("y: " + spacecraft.velocity_y)
+    if (areCirclesColliding(planet, spacecraft) || isSpacecraftOutsideBounds(spacecraft)) {
+        console.log('Collision detected!');
+
+        // Reset the spacecraft position or take other desired action
+        spacecraft.x = planet.x;
+        spacecraft.y = planet.y + 200;
+
+        // Reset the spacecraft velocity
+        spacecraft.velocity_x = 1.3;
+        spacecraft.velocity_y = 0;
+    }
 
 
   }
   
 function acceleration(radius, planet_mass) {
-    const gravity = 10;
+    const gravity = 50;
     if (radius < 0) {
         // console.log("negative")
         return -gravity*(planet_mass/(radius*radius))
