@@ -34,20 +34,19 @@ let arrowUpPressed = false;
 document.addEventListener("keydown", (event) => {
   switch (event.code) {
     case "ArrowLeft":
-    case "ArrowLeft":
         spacecraft.angularVelocity -= 0.005; // Change angular velocity instead of angle
         break;
-        case "ArrowRight":
+    case "ArrowRight":
         spacecraft.angularVelocity += 0.005; // Change angular velocity instead of angle
-      break;
+        break;
     case "ArrowUp":
         arrowUpPressed = true;
         spacecraft.velocity_x += Math.sin(spacecraft.angle)*0.1;
         spacecraft.velocity_y -= Math.cos(spacecraft.angle)*0.1;
-      break;
+        break;
     case "ArrowDown":
-      spacecraft.speed -= 0.1;
-      break;
+        spacecraft.speed -= 0.1;
+        break;
   }
 });
 
