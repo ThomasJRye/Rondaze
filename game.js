@@ -1,4 +1,4 @@
-import { acceleration } from "./physics.js";
+import { acceleration, applyGravity } from "./physics.js";
 import { Nuke } from "./models.js"
 // Initialize canvas
 const canvas = document.getElementById('canvas');
@@ -144,36 +144,18 @@ function isSpacecraftOutsideBounds(spacecraft) {
 // Update the spacecraft's position and momentum
 function update() {
     spacecraft.x += spacecraft.velocity_x;
-    spacecraft.y += spacecraft.velocity_y;
-    
-    let radius_x = Math.abs(spacecraft.x - planet.x);
-    let radius_y = Math.abs(spacecraft.y - planet.y);
-    
-    let radius = Math.sqrt(radius_x*radius_x + radius_y*radius_y);
-    
-    let gravity = acceleration(radius, planet.mass);
-    
-    let angle = Math.atan2(radius_y, radius_x);
-    let acceleration_x = gravity*Math.cos(angle);
-    let acceleration_y = gravity*Math.sin(angle);
+    spacecraft.y += spacecraft.velocity_y;  
 
     // Update the spacecraft's angle based on its angular velocity
     spacecraft.angle += spacecraft.angularVelocity;
 
-    // Optional: apply a damping factor to gradually reduce the angular velocity
+    // Damping
     spacecraft.angularVelocity *= 0.99;
 
-    if (spacecraft.x > planet.x) {
-        acceleration_x = -acceleration_x;
-    }
-    if (spacecraft.y > planet.y) {
-        acceleration_y = -acceleration_y;
-    }
+    let newVelocities = applyGravity(planet, spacecraft.x, spacecraft.y, spacecraft.velocity_x, spacecraft.velocity_y);
+    spacecraft.velocity_x = newVelocities.velocity_x;
+    spacecraft.velocity_y = newVelocities.velocity_y;
     
-    spacecraft.velocity_x += acceleration_x;
-    spacecraft.velocity_y += acceleration_y;
-    
-
     if (areCirclesColliding(planet, spacecraft) || isSpacecraftOutsideBounds(spacecraft)) {
 
         // Reset the spacecraft position or take other desired action

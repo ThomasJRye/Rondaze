@@ -24,6 +24,7 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
       let gravity = acceleration(radius, planet.mass);
       
       let angle = Math.atan2(radius_y, radius_x);
+      
       let acceleration_x = gravity*Math.cos(angle);
       let acceleration_y = gravity*Math.sin(angle);
   
