@@ -1,3 +1,5 @@
+import { acceleration } from "./physics.js";
+import { Nuke } from "./models.js"
 // Initialize canvas
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext("2d");
@@ -10,72 +12,10 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, planet) {
-  this.x = x;
-  this.y = y;
-  this.velocity_x = velocity_x;
-  this.velocity_y = velocity_y;
-  this.angle = angle;
-  this.angularVelocity = angularVelocity;
-  this.radius = 10;
-  this.planet = planet;
-
-  this.update = function() {
-    // Update position based on velocity
-    this.x += this.velocity_x;
-    this.y += this.velocity_y;
-
-    // Apply gravity
-    let radius_x = Math.abs(x - planet.x);
-    let radius_y = Math.abs(y - planet.y);
-    
-    let radius = Math.sqrt(radius_x*radius_x + radius_y*radius_y);
-    
-    let gravity = acceleration(radius, planet.mass);
-    
-    let angle = Math.atan2(radius_y, radius_x);
-    let acceleration_x = gravity*Math.cos(angle);
-    let acceleration_y = gravity*Math.sin(angle);
-
-    // Update the spacecraft's angle based on its angular velocity
-    this.angle += this.angularVelocity;
-
-    // Optional: apply a damping factor to gradually reduce the angular velocity
-    this.angularVelocity *= 0.99;
-
-    if (this.x > planet.x) {
-        acceleration_x = -acceleration_x;
-    }
-    if (this.y > planet.y) {
-        acceleration_y = -acceleration_y;
-    }
-    
-    this.velocity_x += acceleration_x;
-    this.velocity_y += acceleration_y;
-
-    // Update angle based on angular velocity
-    this.angle += this.angularVelocity;
-  };
-
-
-  this.draw = function(ctx) {
-      // Draw the nuke on the canvas
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate(this.angle);
-      ctx.beginPath();
-      ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-      
-      ctx.fillStyle = "#4B5320";
-      ctx.fill();
-      ctx.restore();
-  };
-
-  this.isOutOfBounds = function(canvasWidth, canvasHeight) {
-      return this.x < 0 || this.x > canvasWidth || this.y < 0 || this.y > canvasHeight;
-  };
+function Asteroid(x, y, velocity_x, velocity_y, planet) {
 
 }
+
 
 // Set up the planet
 const planet = {
@@ -145,7 +85,7 @@ function draw() {
 
 
     if (arrowUpPressed) {
-        ctx.save();
+        ctx.save(); 
         ctx.translate(spacecraft.x, spacecraft.y);
         ctx.rotate(spacecraft.angle);
         ctx.beginPath();
@@ -200,9 +140,7 @@ function isSpacecraftOutsideBounds(spacecraft) {
     return spacecraft.x < 0 || spacecraft.x > canvas.width || spacecraft.y < 0 || spacecraft.y > canvas.height;
 }
 
-function applyGravity(planet, object) {
 
-}
 // Update the spacecraft's position and momentum
 function update() {
     spacecraft.x += spacecraft.velocity_x;
@@ -259,25 +197,13 @@ function update() {
 
   }
   
-function acceleration(radius, planet_mass) {
-    const gravity = 50;
-    if (radius < 0) {
-        // console.log("negative")
-        return -gravity*(planet_mass/(radius*radius))
-    } else {
-        // console.log("positive")
-        // console.log(radius)
-        // console.log(gravity*(planet_mass/(radius*radius)))
-        return gravity*(planet_mass/(radius*radius))
-    }
 
-  }
 
 let nukes = [];
 
 function fireNuke(spacecraft) {
     console.log("spacecarft angle", spacecraft.angle)
-    const nuke = new Nuke(spacecraft.x, spacecraft.y, 2*Math.sin(spacecraft.angle) + spacecraft.velocity_x / 2, -2*Math.cos(spacecraft.angle) + spacecraft.velocity_y / 2, spacecraft.angle, 0, planet);
+    const nuke = new Nuke(spacecraft.x, spacecraft.y, Math.sin(spacecraft.angle) + spacecraft.velocity_x / 2, -Math.cos(spacecraft.angle) + spacecraft.velocity_y / 2, spacecraft.angle, 0, planet);
     nukes.push(nuke);
 }
 
