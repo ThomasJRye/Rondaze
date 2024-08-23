@@ -6,10 +6,32 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-
   </head>
   <body>
-    <canvas id="canvas"></canvas>
-    <script src="game.js"></script>
+    <!-- Start Page -->
+    <div id="startPage" class="start-page">
+      <h1>Rondaze</h1>
+      <button class="start-button" onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <script>
+      function startGame() {
+        document.getElementById('startPage').style.display = 'none';
+        document.getElementById('canvas').style.display = 'block';
+        
+        // Call the game start/init function here
+        initGame();
+      }
+
+      function initGame() {
+        // The game.js script should handle the game initialization
+        console.log('Game starting...');
+      }
+    </script>
+
+    <script type='module' src="game.js"></script>
   </body>
 </html>
