@@ -26,7 +26,7 @@ const planet = {
 const spacecraft = {
     x: planet.x + 100, 
     y: planet.y + 100, 
-    radius: 20, // Increase the radius to 20 pixels
+    radius: 10, 
     velocity_x: 1,
     velocity_y: 0,
     angle: 0,
@@ -86,8 +86,18 @@ function draw() {
 
   // Generate a meteor shower
   if (Math.random() <= 0.005) {
-    // 3% chance of executing this block
-    const asteroid =  new Asteroid(canvas.width*0.75, canvas.width, 0.4, -0.25, planet, 10);
+    
+
+    // const asteroid =  new Asteroid(900, 900, 0.85, -0.25, planet, 10);
+    const asteroid = new Asteroid(
+      1500 * (0.6 * Math.random() + 0.4), 
+      1500 * (0.6 * Math.random() + 0.4), 
+      0.85,
+      -0.25,
+      planet,
+      10
+    );
+    
     asteroids.push(asteroid);
 
   }
@@ -157,6 +167,7 @@ function draw() {
     // draw asteroids
     for (let i = 0; i < asteroids.length; i++) {
       asteroids[i].draw(ctx);
+
     }
     
   }
@@ -177,12 +188,34 @@ function isSpacecraftOutsideBounds(spacecraft) {
     return spacecraft.x < 0 || spacecraft.x > canvas.width || spacecraft.y < 0 || spacecraft.y > canvas.height;
 }
 
-function inAtmosphere(x, y, planet) {
-    const dx = x - planet.x;
-    const dy = y - planet.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance < planet.radius + planet.atmosphere;
+function inAtmosphere(distance, planet) {
+  console.log('distance', distance)
+  console.log('planet', planet)
+
+  return distance < planet.radius + planet.atmosphere;
 }
+
+function atmosphericDrag(x,y, planet) {
+
+  const dx = x - planet.x;
+  const dy = y - planet.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (inAtmosphere(distance, planet)) {
+    console.log("in atmosphere")
+    //calculate atmispheric density
+    const atmosphereDensity = 1 - (distance - planet.radius) / planet.atmosphere;
+
+    const dragfactor = atmosphereDensity * 0.0002;
+
+    return dragfactor;
+    
+  } else {
+    return 0;
+  }
+}
+
+
 
 // Update the spacecraft's position and momentum
 function update() {
@@ -192,12 +225,21 @@ function update() {
     spacecraft.angle += spacecraft.angularVelocity;
 
     // Damping
-    spacecraft.angularVelocity *= 0.99;
+    spacecraft.angularVelocity *= 0.995;
 
     let newVelocities = applyGravity(planet, spacecraft.x, spacecraft.y, spacecraft.velocity_x, spacecraft.velocity_y);
     spacecraft.velocity_x = newVelocities.velocity_x;
     spacecraft.velocity_y = newVelocities.velocity_y;
     
+
+    const drag_x = atmosphericDrag(spacecraft.x, spacecraft.x, planet);
+    const drag_y = atmosphericDrag(spacecraft.x, spacecraft.y, planet);
+
+    console.log("drag", drag_x);
+
+    spacecraft.velocity_x *= 1 - (drag_x * spacecraft.velocity_x**2);
+    spacecraft.velocity_y *= 1 - (drag_y * spacecraft.velocity_y**2);
+
     if (areCirclesColliding(planet, spacecraft) || isSpacecraftOutsideBounds(spacecraft)) {
 
         // Reset the spacecraft position or take other desired action
@@ -209,23 +251,56 @@ function update() {
         spacecraft.velocity_y = 0;
     }
 
+    // Update nukes
     for (let i = 0; i < nukes.length; i++) {
+      let nuke = nukes[i];
+      nuke.update();
 
-      nukes[i].update();
+      // Check for collision with planet
+      if (areCirclesColliding(planet, nuke)) {
+        nukes.splice(i, 1);
+        i--;
+        continue; // Skip further checks if the nuke collided with the planet
+      }
 
-      if (areCirclesColliding(planet, nukes[i])) {
-        nukes.splice(i, 1); // Remove the nuke upon collision
-        i--; // Adjust the index after removal
+      // Check for collision with asteroids
+      for (let j = 0; j < asteroids.length; j++) {
+        let asteroid = asteroids[j];
+        
+        if (areCirclesColliding(nuke, asteroid)) {
+          // Remove both the nuke and the asteroid, simulating an explosion
+          nukes.splice(i, 1);
+          asteroids.splice(j, 1);
+          
+          i--; // Adjust the index after removal of the nuke
+          break; // Stop checking other asteroids for this nuke, as it has exploded
+        }
       }
     }
 
+
+    // Update asteroids
     for (let i = 0; i < asteroids.length; i++) {
+      let asteroid = asteroids[i];
 
-      asteroids[i].update();
+      asteroid.update();
 
-      if (areCirclesColliding(planet, asteroids[i])) {
-        asteroids.splice(i, 1); // Remove the nuke upon collision
-        i--; // Adjust the index after removal
+      // Apply gravity to asteroids
+      let asteroidVelocities = applyGravity(planet, asteroid.x, asteroid.y, asteroid.velocity_x, asteroid.velocity_y);
+      asteroid.velocity_x = asteroidVelocities.velocity_x;
+      asteroid.velocity_y = asteroidVelocities.velocity_y;
+
+      // Apply drag to asteroids
+      const asteroid_drag_x = atmosphericDrag(asteroid.x, asteroid.y, planet);
+      const asteroid_drag_y = atmosphericDrag(asteroid.x, asteroid.y, planet);
+
+      asteroid.velocity_x *= 1 - (asteroid_drag_x * Math.abs(asteroid.velocity_x));
+      asteroid.velocity_y *= 1 - (asteroid_drag_y * Math.abs(asteroid.velocity_y));
+
+      // Check for asteroid collision with planet
+      if (areCirclesColliding(planet, asteroid)) {
+        asteroids.splice(i, 1);
+        i--;
       }
     }
 

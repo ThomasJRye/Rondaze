@@ -9,6 +9,7 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
     this.angularVelocity = angularVelocity;
     this.radius = 10;
     this.planet = planet;
+    this.fuse = 10;
   
     this.update = function() {
         // Update position based on velocity
