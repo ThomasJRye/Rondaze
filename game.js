@@ -1,5 +1,5 @@
 import { acceleration, applyGravity } from "./physics.js";
-import { Nuke } from "./models.js"
+import { Nuke, Asteroid } from "./models.js"
 // Initialize canvas
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext("2d");
@@ -12,17 +12,14 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-function Asteroid(x, y, velocity_x, velocity_y, planet) {
-
-}
-
 
 // Set up the planet
 const planet = {
   x: canvas.width / 2,
   y: canvas.height / 2,
-  radius: 30,
+  radius: 50,
   mass: 10,
+  atmosphere: 75
 };
 
 // Set up the spacecraft
@@ -36,6 +33,19 @@ const spacecraft = {
     angularVelocity: 0, // Add angular velocity property
 
   };
+
+
+let nukes = [];
+
+function fireNuke(spacecraft) {
+  console.log("asteroids")
+  const nuke = new Nuke(spacecraft.x, spacecraft.y, (Math.sin(spacecraft.angle) * 0.9) + spacecraft.velocity_x, (-Math.cos(spacecraft.angle) * 0.9) + spacecraft.velocity_y, spacecraft.angle, 0, planet);
+  nukes.push(nuke);
+  console.log(nuke)
+}
+
+
+let asteroids = [];
 
 
 let arrowUpPressed = false;
@@ -73,16 +83,36 @@ document.addEventListener("keyup", (event) => {
 
 // Draw the planet and spacecraft
 function draw() {
+
+  // Generate a meteor shower
+  if (Math.random() <= 0.005) {
+    // 3% chance of executing this block
+    const asteroid =  new Asteroid(canvas.width*0.75, canvas.width, 0.4, -0.25, planet, 10);
+    asteroids.push(asteroid);
+
+  }
+
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   
+    
+  
+    const atmosphereLayers = 10;  // Number of layers to create the gradient effect
+    for (let i = 0; i < atmosphereLayers; i++) {
+      let radius = planet.radius + planet.atmosphere * (i / atmosphereLayers); // Gradually increase the radius
+      let opacity = 0.4 * (1 - i / atmosphereLayers); // Gradually decrease the opacity
+
+      ctx.beginPath();
+      ctx.arc(planet.x, planet.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(135, 206, 235, ${opacity})`; // Use the calculated opacity
+      ctx.fill();
+    }
+    
     // Draw the planet
     ctx.beginPath();
     ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
     ctx.fillStyle = "blue";
     ctx.fill();
-  
-
 
     if (arrowUpPressed) {
         ctx.save(); 
@@ -122,6 +152,13 @@ function draw() {
     for ( let i = 0; i < nukes.length; i++) {
       nukes[i].draw(ctx);
     }
+
+    console.log(asteroids)
+    // draw asteroids
+    for (let i = 0; i < asteroids.length; i++) {
+      asteroids[i].draw(ctx);
+    }
+    
   }
   
 
@@ -140,12 +177,17 @@ function isSpacecraftOutsideBounds(spacecraft) {
     return spacecraft.x < 0 || spacecraft.x > canvas.width || spacecraft.y < 0 || spacecraft.y > canvas.height;
 }
 
+function inAtmosphere(x, y, planet) {
+    const dx = x - planet.x;
+    const dy = y - planet.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < planet.radius + planet.atmosphere;
+}
 
 // Update the spacecraft's position and momentum
 function update() {
     spacecraft.x += spacecraft.velocity_x;
     spacecraft.y += spacecraft.velocity_y;  
-
     // Update the spacecraft's angle based on its angular velocity
     spacecraft.angle += spacecraft.angularVelocity;
 
@@ -177,17 +219,18 @@ function update() {
       }
     }
 
+    for (let i = 0; i < asteroids.length; i++) {
+
+      asteroids[i].update();
+
+      if (areCirclesColliding(planet, asteroids[i])) {
+        asteroids.splice(i, 1); // Remove the nuke upon collision
+        i--; // Adjust the index after removal
+      }
+    }
+
   }
   
-
-
-let nukes = [];
-
-function fireNuke(spacecraft) {
-    console.log("spacecarft angle", spacecraft.angle)
-    const nuke = new Nuke(spacecraft.x, spacecraft.y, Math.sin(spacecraft.angle) + spacecraft.velocity_x / 2, -Math.cos(spacecraft.angle) + spacecraft.velocity_y / 2, spacecraft.angle, 0, planet);
-    nukes.push(nuke);
-}
 
 // Game loop
 function loop() {
