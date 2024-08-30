@@ -31,7 +31,7 @@ const spacecraft = {
   velocity_x: SPACECRAFT.INITIAL_VELOCITY_X,
   velocity_y: SPACECRAFT.INITIAL_VELOCITY_Y,
   angle: SPACECRAFT.INITIAL_ANGLE,
-  angularVelocity: SPACECRAFT.INITIAL_ANGULAR_VELOCITY,
+  angular_velocity: SPACECRAFT.INITIAL_ANGULAR_VELOCITY,
 };
 
 
@@ -54,10 +54,10 @@ let spacebarPressed = false;
 document.addEventListener("keydown", (event) => {
   switch (event.code) {
     case "ArrowLeft":
-      spacecraft.angularVelocity -= 0.005; // Change angular velocity instead of angle
+      spacecraft.angular_velocity -= 0.005; // Change angular velocity instead of angle
       break;
     case "ArrowRight":
-      spacecraft.angularVelocity += 0.005; // Change angular velocity instead of angle
+      spacecraft.angular_velocity += 0.005; // Change angular velocity instead of angle
       break;
     case "ArrowUp":
       console.log("arrow up")
@@ -161,6 +161,9 @@ function draw() {
     // draw nukes
     for ( let i = 0; i < nukes.length; i++) {
       nukes[i].draw(ctx);
+      if (nukes[i].activated) {
+        nukes[i].drawBoom(ctx);
+      }
     }
 
     // draw asteroids
@@ -180,6 +183,15 @@ function areCirclesColliding(circle1, circle2) {
     const sumOfRadii = circle1.radius + circle2.radius;
 
     return distance <= sumOfRadii;
+}
+
+// Checks if circles are within allowed distance
+function areCirclesClose(circle1, circle2, allowedDistance) {
+  const dx = circle1.x - circle2.x;
+  const dy = circle1.y - circle2.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  return distance <= allowedDistance;
 }
 
 // Spacecraft outside bounds detection function
@@ -219,10 +231,10 @@ function atmosphericDrag(x,y, planet) {
 function update() {
   spacecraft.x += spacecraft.velocity_x;
   spacecraft.y += spacecraft.velocity_y;  
-  spacecraft.angle += spacecraft.angularVelocity;
+  spacecraft.angle += spacecraft.angular_velocity;
 
   // Damping
-  spacecraft.angularVelocity *= 0.995;
+  spacecraft.angular_velocity *= 0.995;
 
   // Apply gravity to spacecraft
   let newVelocities = applyGravity(planet, spacecraft.x, spacecraft.y, spacecraft.velocity_x, spacecraft.velocity_y);
@@ -246,10 +258,11 @@ function update() {
 
   // Update nukes
   for (let i = 0; i < nukes.length; i++) {
-      let nuke = nukes[i];
-      nuke.update();
+      
 
-      if (areCirclesColliding(planet, nuke)) {
+      nukes[i].update();
+
+      if (areCirclesColliding(planet, nukes[i])) {
           nukes.splice(i, 1);
           i--;
           continue;
@@ -258,14 +271,32 @@ function update() {
       for (let j = 0; j < asteroids.length; j++) {
           let asteroid = asteroids[j];
 
-          if (areCirclesColliding(nuke, asteroid)) {
-              nukes.splice(i, 1);
-              asteroids.splice(j, 1);
+          if (areCirclesClose(nukes[i], asteroid, 30)) {
+              // Create an explosion
+              nukes[i].activated = true;
               i--;
               break;
           }
       }
-  }
+
+      // if the nuke is activated, remove asteroids within the blast radius
+      if (nukes[i].activated) {
+          for (let j = 0; j < asteroids.length; j++) {
+              let asteroid = asteroids[j];
+
+              if (areCirclesClose(nukes[i], asteroid, nukes[i].boom_radius)) {
+                  asteroids.splice(j, 1);
+                  j--;
+              }
+          }
+          if (nukes[i].boom_radius <= 0) {
+              nukes.splice(i, 1);
+              i--;
+          } else {
+            nukes[i].boom_radius--;
+          }
+      }
+    }
 
   // Apply gravitational attraction between asteroids
   for (let i = 0; i < asteroids.length; i++) {

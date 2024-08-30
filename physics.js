@@ -28,6 +28,6 @@ export function applyGravity(planet, x, y, velocity_x, velocity_y) {
     };
 }
 // Example of using damping factor elsewhere
-export function applyDamping(angularVelocity) {
-    return angularVelocity * DAMPING_FACTOR;
+export function applyDamping(angular_velocity) {
+    return angular_velocity * DAMPING_FACTOR;
 }

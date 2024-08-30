@@ -1,4 +1,4 @@
-import { GRAVITY_CONSTANT, DAMPING_FACTOR, NUKE_RADIUS, NUKE_FUSE, NUKE_COLOR, ASTEROID_BASE_MASS, ASTEROID_COLOR } from './constants.js';
+import { GRAVITY_CONSTANT, DAMPING_FACTOR, NUKE_RADIUS, NUKE_COLOR, BOOM_COLOR, ASTEROID_BASE_MASS, ASTEROID_COLOR, BOOM_RADIUS } from './constants.js';
 import { applyGravity } from './physics.js';
 
 export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, planet) {
@@ -7,10 +7,12 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
     this.velocity_x = velocity_x;
     this.velocity_y = velocity_y;
     this.angle = angle;
-    this.angularVelocity = angularVelocity;
+    this.angular_velocity = angularVelocity;
     this.radius = NUKE_RADIUS;
     this.planet = planet;
-    this.fuse = NUKE_FUSE;
+    this.boom_radius = BOOM_RADIUS
+    this.activated = false;
+
   
     this.update = function() {
         this.x += this.velocity_x;
@@ -39,7 +41,7 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.beginPath();
-        ctx.arc(0, 0, this.radius * 5, 0, Math.PI * 2);
+        ctx.arc(0, 0, this.boom_radius, 0, Math.PI * 2);
         ctx.fillStyle = BOOM_COLOR;
         ctx.fill();
         ctx.restore();

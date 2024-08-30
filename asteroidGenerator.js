@@ -8,10 +8,11 @@ export function generateMeteorShower(numAsteroids, planet) {
         let velocity_x = Math.random() * 2 - 1;
         let velocity_y = Math.random() * 2 - 1;
         let angle = Math.random() * Math.PI * 2;
-        let angularVelocity = Math.random() * 0.1 - 0.05;
+        let angular_velocity = Math.random() * 0.1 - 0.05;
         let radius = Math.random() * 10 + 10;
-        asteroids.push(new Asteroid(x, y, velocity_x, velocity_y, angle, angularVelocity, planet, radius));
+        asteroids.push(new Asteroid(x, y, velocity_x, velocity_y, angle, angular_velocity, planet, radius));
     }
     return asteroids;
 }
 
+ 
