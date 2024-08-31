@@ -1,10 +1,11 @@
-import { acceleration, applyGravity } from "./physics.js";
-import { PLANET, SPACECRAFT, NUKES, ASTEROIDS, ATMOSPHERE_LAYERS, ATMOSPHERE_OPACITY } from './constants.js';
+import { applyGravity, atmosphericDrag, areCirclesClose, areCirclesColliding } from "./physics.js";
+import { PLANET, SPACECRAFT, NUKES, ATMOSPHERE_LAYERS, ATMOSPHERE_OPACITY } from './constants.js';
 
 import { Nuke, Asteroid } from "./models.js"
 // Initialize canvas
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext("2d");
+
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -22,7 +23,6 @@ const planet = {
   atmosphere: PLANET.ATMOSPHERE,
 };
 
-
 // Set up the spacecraft
 const spacecraft = {
   x: planet.x + SPACECRAFT.INITIAL_X_OFFSET,
@@ -34,12 +34,14 @@ const spacecraft = {
   angular_velocity: SPACECRAFT.INITIAL_ANGULAR_VELOCITY,
 };
 
+let score = 0;
 
 let nukes = [];
 
 function fireNuke(spacecraft) {
   console.log("asteroids")
   const nuke = new Nuke(spacecraft.x, spacecraft.y, (Math.sin(spacecraft.angle) * 1.5) + spacecraft.velocity_x, (-Math.cos(spacecraft.angle) * 1.5) + spacecraft.velocity_y, spacecraft.angle, 0, planet);
+  console.log(nuke)
   nukes.push(nuke);
 
 }
@@ -49,21 +51,19 @@ let asteroids = [];
 
 
 let arrowUpPressed = false;
-let spacebarPressed = false;
+
 // Add keyboard controls
 document.addEventListener("keydown", (event) => {
   switch (event.code) {
     case "ArrowLeft":
-      spacecraft.angular_velocity -= 0.005; // Change angular velocity instead of angle
+      spacecraft.angular_velocity -= 0.01; // Change angular velocity instead of angle
       break;
     case "ArrowRight":
-      spacecraft.angular_velocity += 0.005; // Change angular velocity instead of angle
+      spacecraft.angular_velocity += 0.01; // Change angular velocity instead of angle
       break;
     case "ArrowUp":
       console.log("arrow up")
       arrowUpPressed = true;
-      spacecraft.velocity_x += Math.sin(spacecraft.angle)*0.1;
-      spacecraft.velocity_y -= Math.cos(spacecraft.angle)*0.1;
       break;
     case "ArrowDown":
       spacecraft.speed -= 0.1;
@@ -84,6 +84,7 @@ document.addEventListener("keyup", (event) => {
 
 // Draw the planet and spacecraft
 function draw() {
+
 
   // Generate a meteor shower
   if (Math.random() <= 0.005) {
@@ -106,7 +107,9 @@ function draw() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-    
+    ctx.font = "50px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText(Math.round(score / 100),10,80);
   
     for (let i = 0; i < ATMOSPHERE_LAYERS; i++) {
       let radius = planet.radius + planet.atmosphere * (i / ATMOSPHERE_LAYERS); // Gradually increase the radius
@@ -161,9 +164,11 @@ function draw() {
     // draw nukes
     for ( let i = 0; i < nukes.length; i++) {
       nukes[i].draw(ctx);
+      
       if (nukes[i].activated) {
         nukes[i].drawBoom(ctx);
       }
+    
     }
 
     // draw asteroids
@@ -175,60 +180,21 @@ function draw() {
   }
   
 
-// Collision detection function
-function areCirclesColliding(circle1, circle2) {
-    const dx = circle1.x - circle2.x;
-    const dy = circle1.y - circle2.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const sumOfRadii = circle1.radius + circle2.radius;
-
-    return distance <= sumOfRadii;
-}
-
-// Checks if circles are within allowed distance
-function areCirclesClose(circle1, circle2, allowedDistance) {
-  const dx = circle1.x - circle2.x;
-  const dy = circle1.y - circle2.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  return distance <= allowedDistance;
-}
-
 // Spacecraft outside bounds detection function
 function isSpacecraftOutsideBounds(spacecraft) {
     return spacecraft.x < 0 || spacecraft.x > canvas.width || spacecraft.y < 0 || spacecraft.y > canvas.height;
-}
-
-function inAtmosphere(distance, planet) {
-
-
-  return distance < planet.radius + planet.atmosphere;
-}
-
-function atmosphericDrag(x,y, planet) {
-
-  const dx = x - planet.x;
-  const dy = y - planet.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  if (inAtmosphere(distance, planet)) {
-    console.log("in atmosphere")
-    //calculate atmispheric density
-    const atmosphereDensity = 1 - (distance - planet.radius) / planet.atmosphere;
-
-    const dragfactor = atmosphereDensity * 0.0002;
-
-    return dragfactor;
-    
-  } else {
-    return 0;
-  }
 }
 
 
 
 // Update the spacecraft's position and momentum
 function update() {
+  score += 1;
+  if (arrowUpPressed) {
+    spacecraft.velocity_x += Math.sin(spacecraft.angle)*0.003;
+    spacecraft.velocity_y -= Math.cos(spacecraft.angle)*0.003;
+  }
+
   spacecraft.x += spacecraft.velocity_x;
   spacecraft.y += spacecraft.velocity_y;  
   spacecraft.angle += spacecraft.angular_velocity;
@@ -262,6 +228,10 @@ function update() {
 
       nukes[i].update();
 
+      if (nukes[i].fuse <= 0) {
+        nukes[i].activated = true;
+      }
+
       if (areCirclesColliding(planet, nukes[i])) {
           nukes.splice(i, 1);
           i--;
@@ -280,6 +250,9 @@ function update() {
       }
 
       // if the nuke is activated, remove asteroids within the blast radius
+      if (nukes[i] == undefined || nukes[i].activated == undefined) {
+        continue;
+      }
       if (nukes[i].activated) {
           for (let j = 0; j < asteroids.length; j++) {
               let asteroid = asteroids[j];

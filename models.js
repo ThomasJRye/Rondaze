@@ -1,4 +1,4 @@
-import { GRAVITY_CONSTANT, DAMPING_FACTOR, NUKE_RADIUS, NUKE_COLOR, BOOM_COLOR, ASTEROID_BASE_MASS, ASTEROID_COLOR, BOOM_RADIUS } from './constants.js';
+import { NUKES, ASTEROIDS, DAMPING_FACTOR } from './constants.js';
 import { applyGravity } from './physics.js';
 
 export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, planet) {
@@ -8,9 +8,10 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
     this.velocity_y = velocity_y;
     this.angle = angle;
     this.angular_velocity = angularVelocity;
-    this.radius = NUKE_RADIUS;
+    this.radius = NUKES.RADIUS;
+    this.fuse = NUKES.FUSE;
     this.planet = planet;
-    this.boom_radius = BOOM_RADIUS
+    this.boom_radius = NUKES.BOOM_RADIUS;
     this.activated = false;
 
   
@@ -24,6 +25,7 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
 
         this.angle += this.angularVelocity;
         this.angularVelocity *= DAMPING_FACTOR;
+        this.fuse -= 1;
     };
 
     this.draw = function(ctx) {
@@ -32,7 +34,7 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
         ctx.rotate(this.angle);
         ctx.beginPath();
         ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = NUKE_COLOR;
+        ctx.fillStyle = NUKES.COLOR;
         ctx.fill();
         ctx.restore();
     };
@@ -42,7 +44,7 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
         ctx.translate(this.x, this.y);
         ctx.beginPath();
         ctx.arc(0, 0, this.boom_radius, 0, Math.PI * 2);
-        ctx.fillStyle = BOOM_COLOR;
+        ctx.fillStyle = NUKES.BOOM_COLOR;
         ctx.fill();
         ctx.restore();
     }
@@ -58,7 +60,7 @@ export function Asteroid(x, y, velocity_x, velocity_y, planet, radius) {
     this.velocity_x = velocity_x;
     this.velocity_y = velocity_y;
     this.radius = radius;
-    this.mass = radius * radius * ASTEROID_BASE_MASS;
+    this.mass = radius * radius * ASTEROIDS.MASS;
     this.planet = planet;
 
     this.update = function() {
@@ -71,7 +73,7 @@ export function Asteroid(x, y, velocity_x, velocity_y, planet, radius) {
         ctx.translate(this.x, this.y);
         ctx.beginPath();
         ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = ASTEROID_COLOR;
+        ctx.fillStyle = ASTEROIDS.COLOR;
         ctx.fill();
         ctx.restore();
     };
