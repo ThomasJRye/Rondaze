@@ -1,0 +1,26 @@
+/* src/StartScreen.css */
+.start-screen {
+    display: flex;
+    background-color: black;
+    color: white;
+  }
+  
+  .start-title {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+  
+  .start-button {
+    padding: 15px 30px;
+    font-size: 1.5rem;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .start-button:hover {
+    background-color: #4682b4;
+  }
