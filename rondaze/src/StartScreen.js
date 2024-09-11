@@ -1,17 +1,23 @@
 // src/StartScreen.js
 import React from 'react';
 import './StartScreen.css';
-import { Columns } from 'react-bulma-components';
+import { useNavigate } from 'react-router-dom';
 
 const StartScreen = ({ onStart }) => {
+    const navigate = useNavigate();
+
+    const handleStartGame = () => {
+        navigate('/game'); // Redirect to the GamePage
+      };
+
   return (
     <div className="start-screen">
-        <Columns>
+        <div>
             <h1 className="start-title">Welcome to Rondaze!</h1>
-            <button className="start-button" onClick={onStart}>
+            <button className="start-button" onClick={handleStartGame}>
                 Start Game
             </button>
-        </Columns>
+        </div>
     </div>
   );
 };

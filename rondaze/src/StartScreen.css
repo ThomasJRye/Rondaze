@@ -3,6 +3,9 @@
     display: flex;
     background-color: black;
     color: white;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
   }
   
   .start-title {

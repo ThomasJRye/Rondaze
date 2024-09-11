@@ -11,9 +11,10 @@ function App() {
   return (
     <BrowserRouter>
     <Routes>
-      <Route path="/" element={<StartScreen />}>
-        <Route path="game" element={<GameLoader />} />
-      </Route>
+      <Route path="/" element={<StartScreen />} />
+      <Route path="/game" element={<GameLoader />} /> 
+      <Route path="/game-over" element={<h1>Game Over</h1>} />
+      <Route path="/high-scores" element={<h1>You Win!</h1>} />
     </Routes>
   </BrowserRouter>
   );
