@@ -13,6 +13,8 @@ const SaveHighScore = ({ score }) => {
     navigate('/high-scores');
   };
 
+  
+
   return (
     <div className="save-high-score-container">
       <h1>Save High Score</h1>
