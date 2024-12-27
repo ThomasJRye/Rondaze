@@ -1,0 +1,20 @@
+  .info-screen {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  .info-screen h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  
+  .info-screen p {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .info-screen button {
+    font-size: 1em;
+    padding: 10px 20px;
+    cursor: pointer;
+  }

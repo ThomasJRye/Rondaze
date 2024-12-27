@@ -6,9 +6,19 @@ import { useNavigate } from 'react-router-dom';
 const StartScreen = ({ onStart }) => {
     const navigate = useNavigate();
 
+
     const handleStartGame = () => {
         navigate('/game'); // Redirect to the GamePage
       };
+
+      const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleStartGame();
+        }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
 
   return (
     <div className="start-screen">
