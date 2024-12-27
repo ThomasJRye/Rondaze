@@ -4,6 +4,12 @@ import { PLANET, SPACECRAFT, NUKES, ATMOSPHERE_LAYERS, ATMOSPHERE_OPACITY } from
 import { Nuke, Asteroid } from "./models.js"
 // Initialize canvas
 
+var score = 0;
+
+export function getScore() {
+  return score;
+}
+
 export function startGame(canvas, ctx) {
 
   const planet = {
@@ -25,7 +31,6 @@ export function startGame(canvas, ctx) {
     angular_velocity: SPACECRAFT.INITIAL_ANGULAR_VELOCITY,
   };
 
-  let score = 0;
   let gameOver = false;
   let nukes = [];
 
@@ -359,20 +364,17 @@ export function startGame(canvas, ctx) {
   function loop() {
 
     if (!gameOver) {
+      
       draw();
       update();
       requestAnimationFrame(loop);
     } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.font = "80px Arial";
-      ctx.fillStyle = "red";
-      ctx.fillText("Game Over", canvas.width / 2 - 200, canvas.height / 2);
-      ctx.font = "50px Arial";
-      ctx.fillText("Score: " + Math.round(score / 100), canvas.width / 2 - 100, canvas.height / 2 + 60);
+
+      window.location.href = "/game-over";
+
     }
-
-
   }
+
 
   // Start the game loop
   loop();

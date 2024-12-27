@@ -1,0 +1,27 @@
+/* SaveHighScore.css */
+
+.save-high-score-container {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  .save-high-score-container h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  
+  .save-high-score-container p {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+  }
+  
+  .save-high-score-container input {
+    font-size: 1em;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .save-high-score-container button {
+    font-size: 1em;
+    padding: 10px 20px;
+  }
