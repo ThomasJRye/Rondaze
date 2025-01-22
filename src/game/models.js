@@ -62,15 +62,26 @@ export function Asteroid(x, y, velocity_x, velocity_y, planet, radius) {
     this.radius = radius;
     this.mass = radius * radius * ASTEROIDS.MASS;
     this.planet = planet;
+    this.angle = 0;
+    this.angularVelocity = (Math.random() - 0.5) * 0.1; // Random angular velocity
+    const DAMPING_FACTOR = 0.995;
 
     this.update = function() {
         this.x += this.velocity_x;
         this.y += this.velocity_y;
+
+        let newVelocities = applyGravity(planet, this.x, this.y, this.velocity_x, this.velocity_y);
+        this.velocity_x = newVelocities.velocity_x;
+        this.velocity_y = newVelocities.velocity_y;
+
+        this.angle += this.angularVelocity;
+        this.angularVelocity *= DAMPING_FACTOR;
     };
 
     this.draw = function(ctx) {
         ctx.save();
         ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
         ctx.beginPath();
         ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = ASTEROIDS.COLOR;
