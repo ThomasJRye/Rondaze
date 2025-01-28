@@ -1,22 +1,29 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import './SaveHighScoreModal.css';
 
-const SaveHighScoreModal = () => {
+const SaveHighScoreModal = ({ score, refetch }) => {
     const [name, setName] = useState('');
-    const location = useLocation();
-    const score = location.state?.finalScore || 0;
-
     const [showModal, setShowModal] = useState(true);
+
     const handleSave = () => {
-        // Save the high score
-
-        const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-        highScores.push({ name, score });
+        let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
         
-        setShowModal(false);
+        console.log(highScores);
+        // Ensure highScores is an array
+        if (!Array.isArray(highScores)) {
+            highScores = [];
+        }
 
+        highScores.push({ name, score });
+        highScores = highScores.sort((a, b) => b.score - a.score).slice(0, 5);
+        localStorage.setItem('highScores', JSON.stringify(highScores));
+        refetch();
+        setShowModal(false);
     };
+
+    const close = () => {
+        setShowModal(false);
+    }
 
     return (
         <>
@@ -32,6 +39,8 @@ const SaveHighScoreModal = () => {
                             onChange={(e) => setName(e.target.value)}
                         />
                         <button onClick={handleSave}>Save</button>
+                        <button onClick={close}>Cancel</button>
+
                     </div>
                 </div>
             )}
