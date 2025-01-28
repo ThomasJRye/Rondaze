@@ -35,8 +35,8 @@ export const ASTEROIDS = {
 
 
 // Environmental constants
-export const ATMOSPHERE_LAYERS = 10;
-export const ATMOSPHERE_OPACITY = 0.4;
+export const ATMOSPHERE_LAYERS = 50;
+export const ATMOSPHERE_OPACITY = 0.06;
 export const GRAVITY_CONSTANT = 9.81;  // Gravity constant
 export const DAMPING_FACTOR = 0.99;    // Damping factor for reducing angular velocity
 

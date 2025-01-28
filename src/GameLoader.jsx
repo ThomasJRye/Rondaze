@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { startGame } from './game/game.js';
 import './GameLoader.css';
+import { use } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const GameLoader = () => {
     const canvasRef = useRef(null);
     const [showInfo, setShowInfo] = useState(true);
+    const [score, setScore] = useState(0);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -21,6 +25,10 @@ const GameLoader = () => {
     }, []);
 
     useEffect(() => {
+        console.log(score)
+    }, [score]);
+
+    useEffect(() => {
         if (!showInfo) {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
@@ -29,7 +37,7 @@ const GameLoader = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            startGame(canvas, ctx);
+            setScore(startGame(canvas, ctx, navigate));
 
             const handleResize = () => {
                 canvas.width = window.innerWidth;

@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './HighScores.css';
+import SaveHighScoreModal from './SaveHighScoreModal';
+
 
 const HighScores = () => {
-  const [highScores, setHighScores] = useState([]);
-  const navigate = useNavigate();
+  const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
 
-  useEffect(() => {
-    // Fetch high scores from local storage or an API
-    const scores = JSON.parse(localStorage.getItem('highScores')) || [];
-    setHighScores(scores);
-  }, []);
+  const location = useLocation();
+  const score = location.state?.score || 0;
+
+  const navigate = useNavigate();
 
   const handleRetry = () => {
     navigate('/game');
@@ -23,10 +23,11 @@ const HighScores = () => {
 
   return (
     <div className="container">
+      <SaveHighScoreModal score={score}/>
       <h1>High Scores</h1>
       <ul>
-        {highScores.map((score, index) => (
-          <li key={index}>{score}</li>
+        {Object.entries(highScores).map(([name, score], index) => (
+          <li key={index}>{name}: {score}</li>
         ))}
       </ul>
       <button onClick={handleRetry}>Retry</button>

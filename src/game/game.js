@@ -9,7 +9,10 @@ export function getScore() {
   return score;
 }
 
-export function startGame(canvas, ctx) {
+
+export function startGame(canvas, ctx, navigate) {
+  score = 0;
+
   const planet = {
     x: canvas.width / 2,
     y: canvas.height / 2,
@@ -68,21 +71,24 @@ export function startGame(canvas, ctx) {
     }
   });
 
+  let lastMeteorShowerTime = 0;
+
   // Draw the planet and spacecraft
   function draw() {
-    // Generate a meteor shower
-    if (score % 150 === 0) {
+    const currentTime = Date.now();
+
+    // Generate a meteor shower every 10 seconds
+    if (currentTime - lastMeteorShowerTime > 10000) {
+      lastMeteorShowerTime = currentTime;
       var xpos = window.innerWidth;
       var ypos = window.innerHeight;
       var velocity_x = Math.random() * 0.005;
       var velocity_y = Math.random() * 0.0025;
       if (Math.random() < 0.5) {
-
         xpos = xpos * Math.random();
       } else {
         ypos = ypos * Math.random();
       }
-
 
       const radius = (Math.random() * 15) + 2;
 
@@ -315,7 +321,11 @@ export function startGame(canvas, ctx) {
       update();
       requestAnimationFrame(loop);
     } else {
-      window.location.href = "/game-over";
+
+      // Send score to HighScores
+      const finalScore = Math.round(score / 100);
+
+      navigate('/game-over', { state: { finalScore } });
     }
   }
 
