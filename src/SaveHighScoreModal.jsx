@@ -1,29 +1,48 @@
 import React, { useState } from 'react';
 import './SaveHighScoreModal.css';
 
+const API_URL = 'http://localhost:3002/api/highscores';
+
 const SaveHighScoreModal = ({ score, refetch }) => {
     const [name, setName] = useState('');
     const [showModal, setShowModal] = useState(true);
+    const [error, setError] = useState('');
 
-    const handleSave = () => {
-        let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-        
-        console.log(highScores);
-        // Ensure highScores is an array
-        if (!Array.isArray(highScores)) {
-            highScores = [];
+    const handleSave = async () => {
+        if (!name.trim()) {
+            setError('Please enter your name');
+            return;
         }
 
-        highScores.push({ name, score });
-        highScores = highScores.sort((a, b) => b.score - a.score).slice(0, 5);
-        localStorage.setItem('highScores', JSON.stringify(highScores));
-        refetch();
-        setShowModal(false);
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ playerName: name, score }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to save score');
+            }
+
+            refetch();
+            setShowModal(false);
+        } catch (error) {
+            console.error('Error saving score:', error);
+            setError(error.message || 'Failed to save score. Please try again.');
+        }
     };
 
-    const close = () => {
+    const close = async () => {
+        // Save the score before closing if name is entered
+        if (name.trim()) {
+            await handleSave();
+        }
         setShowModal(false);
-    }
+    };
 
     return (
         <>
@@ -32,6 +51,7 @@ const SaveHighScoreModal = ({ score, refetch }) => {
                     <div className="modal-content">
                         <h1>Game Over</h1>
                         <h2>Your Score: {score}</h2>
+                        {error && <p className="error">{error}</p>}
                         <input
                             type="text"
                             placeholder="Enter your name"
@@ -40,7 +60,6 @@ const SaveHighScoreModal = ({ score, refetch }) => {
                         />
                         <button onClick={handleSave}>Save</button>
                         <button onClick={close}>Cancel</button>
-
                     </div>
                 </div>
             )}
