@@ -1,9 +1,45 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { DataGrid } from '@mui/x-data-grid';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import './HighScores.css';
 import SaveHighScoreModal from './SaveHighScoreModal';
 
 const API_URL = 'http://localhost:3002/api/highscores';
+
+// Create a dark theme for the DataGrid
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
+const columns = [
+  { 
+    field: 'rank', 
+    headerName: 'Rank', 
+    width: 90,
+    align: 'center',
+    headerAlign: 'center'
+  },
+  {
+    field: 'username',
+    headerName: 'Player',
+    width: 150,
+    flex: 1,
+    align: 'left',
+    headerAlign: 'left'
+  },
+  {
+    field: 'score',
+    headerName: 'Score',
+    width: 110,
+    type: 'number',
+    flex: 1,
+    align: 'right',
+    headerAlign: 'right'
+  }
+];
 
 const HighScores = () => {
   const [highScores, setHighScores] = useState([]);
@@ -17,7 +53,14 @@ const HighScores = () => {
           throw new Error('Failed to fetch high scores');
         }
         const data = await response.json();
-        setHighScores(data);
+        // Sort data by score in descending order and add rank
+        const sortedData = [...data].sort((a, b) => b.score - a.score);
+        const scoresWithRankAndIds = sortedData.map((score, index) => ({
+          ...score,
+          id: score.id || index + 1,
+          rank: index + 1
+        }));
+        setHighScores(scoresWithRankAndIds);
       } catch (error) {
         console.error('Error fetching high scores:', error);
       }
@@ -42,13 +85,44 @@ const HighScores = () => {
     <div className="container">
       <SaveHighScoreModal score={score} refetch={() => setRefetch(!refetch)} />
       <h1>High Scores</h1>
-      <ul>
-        {highScores.map((entry, index) => (
-          <li key={index}>{entry.username}: {entry.score}</li>
-        ))}
-      </ul>
-      <button onClick={handleRetry}>Retry</button>
-      <button onClick={handleHome}>Home</button>
+      <div style={{ height: 400, width: '100%', backgroundColor: '#1e1e1e' }}>
+        <ThemeProvider theme={darkTheme}>
+          <DataGrid
+            rows={highScores}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableSelectionOnClick
+            initialState={{
+              sorting: {
+                sortModel: [{ field: 'score', sort: 'desc' }],
+              },
+            }}
+            sx={{
+              border: 1,
+              borderColor: '#444',
+              '& .MuiDataGrid-cell:hover': {
+                color: '#61dafb',
+              },
+              '& .MuiDataGrid-columnHeaders': {
+                backgroundColor: '#1a1a1a',
+                borderBottom: '2px solid #444',
+              },
+              '& .MuiDataGrid-cell': {
+                borderBottom: '1px solid #333',
+              },
+              '& .MuiDataGrid-footerContainer': {
+                backgroundColor: '#1a1a1a',
+                borderTop: '2px solid #444',
+              },
+            }}
+          />
+        </ThemeProvider>
+      </div>
+      <div className="button-container">
+        <button onClick={handleRetry}>Retry</button>
+        <button onClick={handleHome}>Home</button>
+      </div>
     </div>
   );
 };
