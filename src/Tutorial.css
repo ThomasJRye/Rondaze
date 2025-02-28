@@ -1,0 +1,76 @@
+.tutorial-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: #111;
+}
+
+.game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.tutorial-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+}
+
+.tutorial-content {
+    background-color: rgba(30, 30, 30, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    color: white;
+}
+
+.tutorial-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #1e90ff;
+}
+
+.tutorial-content p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.tutorial-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.tutorial-buttons button {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.tutorial-buttons button:hover {
+    background-color: #4682b4;
+}
+
+.tutorial-buttons button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.3);
+} 

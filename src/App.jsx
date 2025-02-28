@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import StartScreen from "./StartScreen";
 import GameLoader from "./GameLoader";
 import HighScores from "./HighScores";
+import Tutorial from "./Tutorial";
 import './App.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
     <Routes>
       <Route path="/" element={<StartScreen />} />
       <Route path="/game" element={<GameLoader />} /> 
+      <Route path="/tutorial" element={<Tutorial />} />
       <Route path="/game-over" element={<HighScores />} />
       <Route path="/high-scores" element={<h1>You Win!</h1>} />
     </Routes>

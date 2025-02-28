@@ -9,8 +9,7 @@ export function getScore() {
   return score;
 }
 
-
-export function startGame(canvas, ctx, navigate) {
+export function startGame(canvas, ctx, navigate, isTutorial = false) {
   score = 0;
 
   const planet = {
@@ -38,8 +37,10 @@ export function startGame(canvas, ctx, navigate) {
   let arrowUpPressed = false;
 
   function fireNuke(spacecraft) {
-    const nuke = new Nuke(spacecraft.x, spacecraft.y, (Math.sin(spacecraft.angle) * 1.5) + spacecraft.velocity_x, (-Math.cos(spacecraft.angle) * 1.5) + spacecraft.velocity_y, spacecraft.angle, 0, planet);
-    nukes.push(nuke);
+    if (!isTutorial) {
+      const nuke = new Nuke(spacecraft.x, spacecraft.y, (Math.sin(spacecraft.angle) * 1.5) + spacecraft.velocity_x, (-Math.cos(spacecraft.angle) * 1.5) + spacecraft.velocity_y, spacecraft.angle, 0, planet);
+      nukes.push(nuke);
+    }
   }
 
   // Add keyboard controls

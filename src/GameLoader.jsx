@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { startGame } from './game/game.js';
 import './GameLoader.css';
-import { use } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const GameLoader = () => {

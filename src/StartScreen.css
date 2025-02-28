@@ -6,24 +6,55 @@
     height: 100%;
     align-items: center;
     justify-content: center;
-  }
-  
-  .start-title {
+}
+
+.start-content {
+    text-align: center;
+}
+
+.start-title {
     font-size: 3rem;
     margin-bottom: 20px;
-  }
-  
-  .start-button {
+}
+
+.button-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.start-button,
+.tutorial-button,
+.highscores-button {
     padding: 15px 30px;
     font-size: 1.5rem;
-    background-color: #1e90ff;
     color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
-  }
-  
-  .start-button:hover {
+}
+
+.start-button {
+    background-color: #1e90ff;
+}
+
+.tutorial-button {
+    background-color: #4CAF50;
+}
+
+.highscores-button {
+    background-color: #9932CC;
+}
+
+.start-button:hover {
     background-color: #4682b4;
-  }
+}
+
+.tutorial-button:hover {
+    background-color: #45a049;
+}
+
+.highscores-button:hover {
+    background-color: #8B008B;
+}
