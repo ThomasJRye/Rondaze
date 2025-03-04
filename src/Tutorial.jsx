@@ -7,27 +7,33 @@ const Tutorial = () => {
     const canvasRef = useRef(null);
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
+    const [tutorialLevel, setTutorialLevel] = useState(1);
 
     const tutorialSteps = [
         {
             title: "Welcome to the Tutorial!",
-            content: "Let's learn how to play Rondaze. Press Next to continue."
+            content: "Let's learn how to play Rondaze. First, let's practice moving your spacecraft. Use the LEFT and RIGHT arrow keys to rotate.",
+            level: 1
         },
         {
-            title: "Basic Controls",
-            content: "Use the LEFT and RIGHT arrow keys to rotate your spacecraft around the planet."
+            title: "Basic Movement",
+            content: "Great! Now try using the UP arrow to thrust forward. The planet's gravity will affect your movement.",
+            level: 1
         },
         {
-            title: "Weapons",
-            content: "Press SPACEBAR to launch nukes at incoming asteroids."
+            title: "Weapons Training",
+            content: "Time to practice shooting! A slow asteroid will appear. Press SPACEBAR to launch nukes at it.",
+            level: 2
         },
         {
-            title: "Objective",
-            content: "Protect the planet by destroying asteroids before they hit the atmosphere."
+            title: "Multiple Targets",
+            content: "Now let's try handling multiple asteroids. Remember to time your shots carefully!",
+            level: 3
         },
         {
             title: "Ready to Play",
-            content: "You're now ready to defend the planet! Click 'Start Game' to begin."
+            content: "You've completed the tutorial! Click 'Start Game' to begin Level 1 of the real game.",
+            level: 3
         }
     ];
 
@@ -39,9 +45,12 @@ const Tutorial = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            // Pass a dummy navigation function and enable tutorial mode
+            // Pass tutorial mode option with current tutorial level
             const dummyNavigate = () => {};
-            startGame(canvas, ctx, dummyNavigate, true);
+            startGame(canvas, ctx, dummyNavigate, { 
+                isTutorial: true, 
+                level: tutorialLevel 
+            });
 
             const handleResize = () => {
                 canvas.width = window.innerWidth;
@@ -51,22 +60,32 @@ const Tutorial = () => {
             window.addEventListener("resize", handleResize);
             return () => window.removeEventListener("resize", handleResize);
         }
-    }, []);
+    }, [tutorialLevel]);
 
     const handleNext = () => {
         if (currentStep < tutorialSteps.length - 1) {
-            setCurrentStep(currentStep + 1);
+            const nextStep = currentStep + 1;
+            setCurrentStep(nextStep);
+            // Update tutorial level if the next step has a different level
+            if (tutorialSteps[nextStep].level !== tutorialLevel) {
+                setTutorialLevel(tutorialSteps[nextStep].level);
+            }
         }
     };
 
     const handlePrevious = () => {
         if (currentStep > 0) {
-            setCurrentStep(currentStep - 1);
+            const prevStep = currentStep - 1;
+            setCurrentStep(prevStep);
+            // Update tutorial level if the previous step has a different level
+            if (tutorialSteps[prevStep].level !== tutorialLevel) {
+                setTutorialLevel(tutorialSteps[prevStep].level);
+            }
         }
     };
 
     const handleStartGame = () => {
-        navigate('/game');
+        navigate('/game', { state: { level: 1 } });
     };
 
     return (

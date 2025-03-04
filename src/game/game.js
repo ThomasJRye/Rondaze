@@ -1,6 +1,7 @@
 import { applyGravity, atmosphericDrag, areCirclesClose, areCirclesColliding } from "./physics.js";
 import { PLANET, SPACECRAFT, NUKES, ATMOSPHERE_LAYERS, ATMOSPHERE_OPACITY } from './constants.js';
 import { Nuke, Asteroid } from "./models.js";
+import { LEVELS, TUTORIAL_LEVELS } from "./levels.js";
 
 // Initialize canvas
 var score = 0;
@@ -9,24 +10,28 @@ export function getScore() {
   return score;
 }
 
-export function startGame(canvas, ctx, navigate, isTutorial = false) {
+export function startGame(canvas, ctx, navigate, options = {}) {
+  const { isTutorial = false, level = 1 } = options;
+  const levelConfig = isTutorial ? TUTORIAL_LEVELS[level] : LEVELS[level];
   score = 0;
 
   const planet = {
     x: canvas.width / 2,
     y: canvas.height / 2,
-    radius: PLANET.RADIUS,
-    mass: PLANET.MASS,
-    atmosphere: PLANET.ATMOSPHERE,
+    radius: levelConfig.planet.radius,
+    mass: levelConfig.planet.mass,
+    atmosphere: levelConfig.planet.atmosphere,
+    color: levelConfig.planet.color,
+    atmosphereColor: levelConfig.planet.atmosphereColor
   };
 
   // Set up the spacecraft
   const spacecraft = {
-    x: planet.x + SPACECRAFT.INITIAL_X_OFFSET,
-    y: planet.y + SPACECRAFT.INITIAL_Y_OFFSET,
+    x: planet.x + levelConfig.spacecraft.xOffset,
+    y: planet.y + levelConfig.spacecraft.yOffset,
     radius: SPACECRAFT.RADIUS,
-    velocity_x: SPACECRAFT.INITIAL_VELOCITY_X,
-    velocity_y: SPACECRAFT.INITIAL_VELOCITY_Y,
+    velocity_x: levelConfig.spacecraft.initialVelocity.x,
+    velocity_y: levelConfig.spacecraft.initialVelocity.y,
     angle: SPACECRAFT.INITIAL_ANGLE,
     angular_velocity: SPACECRAFT.INITIAL_ANGULAR_VELOCITY,
   };
@@ -35,6 +40,7 @@ export function startGame(canvas, ctx, navigate, isTutorial = false) {
   let nukes = [];
   let asteroids = [];
   let arrowUpPressed = false;
+  let lastMeteorShowerTime = 0;
 
   function fireNuke(spacecraft) {
     if (!isTutorial) {
@@ -72,31 +78,34 @@ export function startGame(canvas, ctx, navigate, isTutorial = false) {
     }
   });
 
-  let lastMeteorShowerTime = 0;
+  function generateAsteroid() {
+    if (isTutorial) return;
+
+    const currentTime = Date.now();
+    if (currentTime - lastMeteorShowerTime > levelConfig.asteroids.spawnInterval) {
+      lastMeteorShowerTime = currentTime;
+
+      for (let i = 0; i < levelConfig.asteroids.spawnRate; i++) {
+        var xpos = window.innerWidth;
+        var ypos = window.innerHeight;
+        var velocity_x = Math.random() * levelConfig.asteroids.initialVelocity.x;
+        var velocity_y = Math.random() * levelConfig.asteroids.initialVelocity.y;
+        
+        if (Math.random() < 0.5) {
+          xpos = xpos * Math.random();
+        } else {
+          ypos = ypos * Math.random();
+        }
+
+        const radius = (Math.random() * (levelConfig.asteroids.maxRadius - levelConfig.asteroids.minRadius)) + levelConfig.asteroids.minRadius;
+        const asteroid = new Asteroid(xpos, ypos, velocity_x, velocity_y, planet, radius);
+        asteroids.push(asteroid);
+      }
+    }
+  }
 
   // Draw the planet and spacecraft
   function draw() {
-    const currentTime = Date.now();
-
-    // Generate a meteor shower every 10 seconds
-    if (currentTime - lastMeteorShowerTime > 10000) {
-      lastMeteorShowerTime = currentTime;
-      var xpos = window.innerWidth;
-      var ypos = window.innerHeight;
-      var velocity_x = Math.random() * 0.005;
-      var velocity_y = Math.random() * 0.0025;
-      if (Math.random() < 0.5) {
-        xpos = xpos * Math.random();
-      } else {
-        ypos = ypos * Math.random();
-      }
-
-      const radius = (Math.random() * 15) + 2;
-
-      const asteroid = new Asteroid(xpos, ypos, velocity_x, velocity_y, planet, radius);
-      asteroids.push(asteroid);
-    }
-
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -104,20 +113,22 @@ export function startGame(canvas, ctx, navigate, isTutorial = false) {
     ctx.fillStyle = "white";
     ctx.fillText(Math.round(score / 100), 10, 80);
 
+    // Draw atmosphere
     for (let i = 0; i < ATMOSPHERE_LAYERS; i++) {
       let radius = planet.radius + planet.atmosphere * (i / ATMOSPHERE_LAYERS);
       let opacity_for_layer = ATMOSPHERE_OPACITY * (1 - i / ATMOSPHERE_LAYERS);
+      let atmosphereColor = planet.atmosphereColor.replace("{opacity}", opacity_for_layer);
 
       ctx.beginPath();
       ctx.arc(planet.x, planet.y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(135, 206, 235, ${opacity_for_layer})`;
+      ctx.fillStyle = atmosphereColor;
       ctx.fill();
     }
 
     // Draw the planet
     ctx.beginPath();
     ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = planet.color;
     ctx.fill();
 
     if (arrowUpPressed) {
@@ -318,15 +329,14 @@ export function startGame(canvas, ctx, navigate, isTutorial = false) {
   // Game loop
   function loop() {
     if (!gameOver) {
+      generateAsteroid();
       draw();
       update();
       requestAnimationFrame(loop);
     } else {
-
       // Send score to HighScores
       const finalScore = Math.round(score / 100);
-
-      navigate('/game-over', { state: { finalScore } });
+      navigate('/game-over', { state: { finalScore, level } });
     }
   }
 
