@@ -15,6 +15,17 @@ export function startGame(canvas, ctx, navigate, options = {}) {
   const levelConfig = isTutorial ? TUTORIAL_LEVELS[level] : LEVELS[level];
   score = 0;
 
+  let gameOver = false;
+  let nukes = [];
+  let asteroids = [];
+  let arrowUpPressed = false;
+  let lastMeteorShowerTime = 0;
+  let animationFrameId = null;
+  
+  // Event listener references for cleanup
+  const keydownListener = handleKeyDown;
+  const keyupListener = handleKeyUp;
+
   const planet = {
     x: canvas.width / 2,
     y: canvas.height / 2,
@@ -36,11 +47,14 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     angular_velocity: SPACECRAFT.INITIAL_ANGULAR_VELOCITY,
   };
 
-  let gameOver = false;
-  let nukes = [];
-  let asteroids = [];
-  let arrowUpPressed = false;
-  let lastMeteorShowerTime = 0;
+  function resetSpacecraft() {
+    spacecraft.x = planet.x + levelConfig.spacecraft.xOffset;
+    spacecraft.y = planet.y + levelConfig.spacecraft.yOffset;
+    spacecraft.velocity_x = levelConfig.spacecraft.initialVelocity.x;
+    spacecraft.velocity_y = levelConfig.spacecraft.initialVelocity.y;
+    spacecraft.angle = SPACECRAFT.INITIAL_ANGLE;
+    spacecraft.angular_velocity = SPACECRAFT.INITIAL_ANGULAR_VELOCITY;
+  }
 
   function fireNuke(spacecraft) {
     if (!isTutorial) {
@@ -49,8 +63,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     }
   }
 
-  // Add keyboard controls
-  document.addEventListener("keydown", (event) => {
+  function handleKeyDown(event) {
     switch (event.code) {
       case "ArrowLeft":
         spacecraft.angular_velocity -= 0.01;
@@ -70,13 +83,30 @@ export function startGame(canvas, ctx, navigate, options = {}) {
       default:
         break;
     }
-  });
+  }
 
-  document.addEventListener("keyup", (event) => {
+  function handleKeyUp(event) {
     if (event.code === "ArrowUp") {
       arrowUpPressed = false;
     }
-  });
+  }
+
+  // Add keyboard controls
+  document.addEventListener("keydown", keydownListener);
+  document.addEventListener("keyup", keyupListener);
+
+  function cleanup() {
+    // Remove event listeners
+    document.removeEventListener("keydown", keydownListener);
+    document.removeEventListener("keyup", keyupListener);
+    // Cancel animation frame
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+    // Clear arrays
+    nukes = [];
+    asteroids = [];
+  }
 
   function generateAsteroid() {
     if (isTutorial) return;
@@ -332,14 +362,33 @@ export function startGame(canvas, ctx, navigate, options = {}) {
       generateAsteroid();
       draw();
       update();
-      requestAnimationFrame(loop);
+      animationFrameId = requestAnimationFrame(loop);
     } else {
-      // Send score to HighScores
-      const finalScore = Math.round(score / 100);
-      navigate('/game-over', { state: { finalScore, level } });
+      if (isTutorial) {
+        // In tutorial mode, reset everything and continue
+        gameOver = false;
+        resetSpacecraft();
+        nukes = [];
+        asteroids = [];
+        score = 0;
+        lastMeteorShowerTime = 0;
+        loop(); // Restart the game loop
+      } else {
+        // In normal game mode, navigate to game over
+        cleanup();
+        const finalScore = Math.round(score / 100);
+        navigate('/game-over', { state: { finalScore, level } });
+      }
     }
   }
 
   // Start the game loop
   loop();
+
+  // Return cleanup function and game control methods
+  return {
+    cleanup,
+    resetSpacecraft,
+    isGameOver: () => gameOver
+  };
 }

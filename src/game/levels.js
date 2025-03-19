@@ -1,4 +1,32 @@
 export const TUTORIAL_LEVELS = {
+    0: {
+        // Initial level - just the player and planet
+        planet: {
+            radius: 25,
+            mass: 15,
+            atmosphere: 100,
+            color: "lightblue",
+            atmosphereColor: "rgba(135, 206, 235, {opacity})"
+        },
+        asteroids: {
+            spawnInterval: 999999,
+            minRadius: 0,
+            maxRadius: 0,
+            spawnRate: 0,
+            initialVelocity: {
+                x: 0,
+                y: 0
+            }
+        },
+        spacecraft: {
+            xOffset: 100,
+            yOffset: 200,
+            initialVelocity: {
+                x: 0.2,
+                y: 0
+            }
+        }
+    },
     1: {
         // Just the player and planet - for learning movement
         planet: {

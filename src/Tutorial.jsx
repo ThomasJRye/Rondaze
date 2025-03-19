@@ -1,110 +1,125 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { startGame } from './game/game.js';
+import { startGame } from './game/game';
 import './Tutorial.css';
+import KeyboardKey from './KeyboardKey';
 
 const Tutorial = () => {
-    const canvasRef = useRef(null);
-    const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
-    const [tutorialLevel, setTutorialLevel] = useState(1);
+    const [game, setGame] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleKeyPress = (event) => {
+            if (event.key === 'Enter') {
+                progressTutorial();
+            }
+        };
+
+        window.addEventListener('keypress', handleKeyPress);
+        return () => {
+            window.removeEventListener('keypress', handleKeyPress);
+        };
+    }, [currentStep]);
+
+    const progressTutorial = () => {
+        if (currentStep < tutorialSteps.length - 1) {
+            setCurrentStep(currentStep + 1);
+        } else {
+            navigate('/');
+        }
+    };
 
     const tutorialSteps = [
         {
-            title: "Welcome to the Tutorial!",
-            content: "Let's learn how to play Rondaze. First, let's practice moving your spacecraft. Use the LEFT and RIGHT arrow keys to rotate.",
-            level: 1
+            level: 0,
+            content: (
+                <p>
+                    Welcome to the tutorial! Let's learn how to play. Use <KeyboardKey keyName="LEFT" /> and <KeyboardKey keyName="RIGHT" /> to rotate your spacecraft.
+                    Press <KeyboardKey keyName="ENTER" /> to continue.
+                </p>
+            )
         },
         {
-            title: "Basic Movement",
-            content: "Great! Now try using the UP arrow to thrust forward. The planet's gravity will affect your movement.",
-            level: 1
+            level: 1,
+            content: (
+                <p>
+                    Great! Now use <KeyboardKey keyName="UP" /> to activate your thrusters and move forward.
+                    Remember that momentum will keep you moving! Press <KeyboardKey keyName="ENTER" /> to continue.
+                </p>
+            )
         },
         {
-            title: "Weapons Training",
-            content: "Time to practice shooting! A slow asteroid will appear. Press SPACEBAR to launch nukes at it.",
-            level: 2
+            level: 2,
+            content: (
+                <p>
+                    Time for weapons training! Press <KeyboardKey keyName="SPACE" /> to fire your weapon.
+                    Try to hit the target! Press <KeyboardKey keyName="ENTER" /> to continue.
+                </p>
+            )
         },
         {
-            title: "Multiple Targets",
-            content: "Now let's try handling multiple asteroids. Remember to time your shots carefully!",
-            level: 3
+            level: 3,
+            content: (
+                <p>
+                    Now let's try hitting multiple targets! Use <KeyboardKey keyName="SPACE" /> to destroy all asteroids.
+                    Press <KeyboardKey keyName="ENTER" /> to continue.
+                </p>
+            )
         },
         {
-            title: "Ready to Play",
-            content: "You've completed the tutorial! Click 'Start Game' to begin Level 1 of the real game.",
-            level: 3
+            level: 4,
+            content: (
+                <p>
+                    You're ready for the real challenge! Press <KeyboardKey keyName="ENTER" /> to return to the main menu and start your adventure!
+                </p>
+            )
         }
     ];
 
     useEffect(() => {
-        if (canvasRef.current) {
-            const canvas = canvasRef.current;
+        const canvas = document.getElementById('tutorialCanvas');
+        if (canvas) {
             const ctx = canvas.getContext('2d');
-
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            // Pass tutorial mode option with current tutorial level
-            const dummyNavigate = () => {};
-            startGame(canvas, ctx, dummyNavigate, { 
+            const gameInstance = startGame(canvas, ctx, () => {
+                const canvas = document.getElementById('tutorialCanvas');
+                const ctx = canvas.getContext('2d');
+                setGame(startGame(canvas, ctx, () => {}, { 
+                    isTutorial: true, 
+                    level: tutorialSteps[currentStep].level 
+                }));
+            }, { 
                 isTutorial: true, 
-                level: tutorialLevel 
+                level: tutorialSteps[currentStep].level 
             });
+
+            setGame(gameInstance);
 
             const handleResize = () => {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             };
+            window.addEventListener('resize', handleResize);
 
-            window.addEventListener("resize", handleResize);
-            return () => window.removeEventListener("resize", handleResize);
+            return () => {
+                window.removeEventListener('resize', handleResize);
+                if (gameInstance && gameInstance.cleanup) {
+                    gameInstance.cleanup();
+                }
+            };
         }
-    }, [tutorialLevel]);
-
-    const handleNext = () => {
-        if (currentStep < tutorialSteps.length - 1) {
-            const nextStep = currentStep + 1;
-            setCurrentStep(nextStep);
-            // Update tutorial level if the next step has a different level
-            if (tutorialSteps[nextStep].level !== tutorialLevel) {
-                setTutorialLevel(tutorialSteps[nextStep].level);
-            }
-        }
-    };
-
-    const handlePrevious = () => {
-        if (currentStep > 0) {
-            const prevStep = currentStep - 1;
-            setCurrentStep(prevStep);
-            // Update tutorial level if the previous step has a different level
-            if (tutorialSteps[prevStep].level !== tutorialLevel) {
-                setTutorialLevel(tutorialSteps[prevStep].level);
-            }
-        }
-    };
-
-    const handleStartGame = () => {
-        navigate('/game', { state: { level: 1 } });
-    };
+    }, [currentStep]);
 
     return (
         <div className="tutorial-container">
-            <canvas ref={canvasRef} className="game-canvas"></canvas>
-            <div className="tutorial-overlay">
-                <div className="tutorial-content">
-                    <h2>{tutorialSteps[currentStep].title}</h2>
-                    <p>{tutorialSteps[currentStep].content}</p>
-                    <div className="tutorial-buttons">
-                        {currentStep > 0 && (
-                            <button onClick={handlePrevious}>Previous</button>
-                        )}
-                        {currentStep < tutorialSteps.length - 1 ? (
-                            <button onClick={handleNext}>Next</button>
-                        ) : (
-                            <button onClick={handleStartGame}>Start Game</button>
-                        )}
-                    </div>
+            <canvas id="tutorialCanvas"></canvas>
+            <div className="tutorial-info">
+                {tutorialSteps[currentStep].content}
+                <div className="tutorial-buttons">
+                    <button onClick={() => navigate('/')}>Exit Tutorial</button>
                 </div>
             </div>
         </div>
