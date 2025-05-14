@@ -9,7 +9,6 @@ const GameLoader = () => {
     const [score, setScore] = useState(0);
     const navigate = useNavigate();
     const location = useLocation();
-    const level = location.state?.level || 1;
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -38,7 +37,7 @@ const GameLoader = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            setScore(startGame(canvas, ctx, navigate, { level }));
+            setScore(startGame(canvas, ctx, navigate));
 
             const handleResize = () => {
                 canvas.width = window.innerWidth;
@@ -56,7 +55,7 @@ const GameLoader = () => {
                 window.removeEventListener("gameOver", handleGameOver);
             };
         }
-    }, [showInfo, level, navigate]);
+    }, [showInfo, navigate]);
 
     const handleStartGame = () => {
         setShowInfo(false);
@@ -66,12 +65,11 @@ const GameLoader = () => {
         <div>
             {showInfo ? (
                 <div className="info-screen">
-                    <h1>Level {level}</h1>
                     <h2>Game Instructions</h2>
                     <p>Use the arrow keys for steering.</p>
                     <p>Press the spacebar to launch nukes.</p>
                     <p>Stop asteroids from hitting the planet.</p>
-                    <button onClick={handleStartGame}>Start Level</button>
+                    <button onClick={handleStartGame}>Start Game</button>
                 </div>
             ) : (
                 <canvas ref={canvasRef} id="canvas"></canvas>

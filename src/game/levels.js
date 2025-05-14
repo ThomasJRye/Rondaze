@@ -22,7 +22,7 @@ export const TUTORIAL_LEVELS = {
             xOffset: 100,
             yOffset: 200,
             initialVelocity: {
-                x: 0.2,
+                x: 0.5,
                 y: 0
             }
         }
@@ -50,7 +50,7 @@ export const TUTORIAL_LEVELS = {
             xOffset: 100,
             yOffset: 200,
             initialVelocity: {
-                x: 0.2,
+                x: 0.5,
                 y: 0
             }
         }
@@ -78,7 +78,7 @@ export const TUTORIAL_LEVELS = {
             xOffset: 100,
             yOffset: 200,
             initialVelocity: {
-                x: 0.2,
+                x: 0.5,
                 y: 0
             }
         }
@@ -93,20 +93,52 @@ export const TUTORIAL_LEVELS = {
             atmosphereColor: "rgba(135, 206, 235, {opacity})"
         },
         asteroids: {
-            spawnInterval: 12000,
-            minRadius: 8,
-            maxRadius: 12,
-            spawnRate: 2,
+            spawnInterval: 999999, // Disable spawning
+            minRadius: 10,
+            maxRadius: 10,
+            spawnRate: 0,
             initialVelocity: {
                 x: 0.003,
                 y: 0.0015
+            },
+            initialAsteroids: [
+                { x: 300, y: 200, velocity_x: 0.003, velocity_y: 0.0015 },
+                { x: 500, y: 300, velocity_x: -0.003, velocity_y: -0.0015 }
+            ]
+        },
+        spacecraft: {
+            xOffset: 100,
+            yOffset: 200,
+            initialVelocity: {
+                x: 0.5,
+                y: 0
+            }
+        }
+    },
+    4: {
+        // Final tutorial level - slightly more challenging
+        planet: {
+            radius: 25,
+            mass: 15,
+            atmosphere: 100,
+            color: "lightblue",
+            atmosphereColor: "rgba(135, 206, 235, {opacity})"
+        },
+        asteroids: {
+            spawnInterval: 10000,
+            minRadius: 8,
+            maxRadius: 15,
+            spawnRate: 2,
+            initialVelocity: {
+                x: 0.004,
+                y: 0.002
             }
         },
         spacecraft: {
             xOffset: 100,
             yOffset: 200,
             initialVelocity: {
-                x: 0.2,
+                x: 0.5,
                 y: 0
             }
         }

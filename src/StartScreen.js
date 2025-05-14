@@ -1,5 +1,5 @@
 // src/StartScreen.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import './StartScreen.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,13 +18,20 @@ const StartScreen = ({ onStart }) => {
         navigate('/game-over');
     };
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleStartGame();
-        }
-    };
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Enter') {
+                handleStartGame();
+            }
+        };
 
-    window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keydown', handleKeyDown);
+        
+        // Cleanup event listener when component unmounts
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     return (
         <div className="start-screen">

@@ -26,6 +26,13 @@ export function startGame(canvas, ctx, navigate, options = {}) {
   const keydownListener = handleKeyDown;
   const keyupListener = handleKeyUp;
 
+  // In tutorial mode, provide a custom navigate function that doesn't actually navigate away
+  const safeNavigate = isTutorial ? 
+    () => {
+      // Do nothing in tutorial mode - don't navigate away
+      resetGame();
+    } : navigate;
+
   const planet = {
     x: canvas.width / 2,
     y: canvas.height / 2,
@@ -47,6 +54,31 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     angular_velocity: SPACECRAFT.INITIAL_ANGULAR_VELOCITY,
   };
 
+  function resetGame() {
+    // In tutorial mode, reset everything and continue
+    gameOver = false;
+    resetSpacecraft();
+    nukes = [];
+    asteroids = [];
+    score = 0;
+    lastMeteorShowerTime = 0;
+    
+    // Recreate initial asteroids for level 3
+    if (isTutorial && level === 3 && levelConfig.asteroids.initialAsteroids) {
+      levelConfig.asteroids.initialAsteroids.forEach(asteroidConfig => {
+        const asteroid = new Asteroid(
+          asteroidConfig.x,
+          asteroidConfig.y,
+          asteroidConfig.velocity_x,
+          asteroidConfig.velocity_y,
+          planet,
+          levelConfig.asteroids.minRadius
+        );
+        asteroids.push(asteroid);
+      });
+    }
+  }
+
   function resetSpacecraft() {
     spacecraft.x = planet.x + levelConfig.spacecraft.xOffset;
     spacecraft.y = planet.y + levelConfig.spacecraft.yOffset;
@@ -57,13 +89,19 @@ export function startGame(canvas, ctx, navigate, options = {}) {
   }
 
   function fireNuke(spacecraft) {
-    if (!isTutorial) {
-      const nuke = new Nuke(spacecraft.x, spacecraft.y, (Math.sin(spacecraft.angle) * 1.5) + spacecraft.velocity_x, (-Math.cos(spacecraft.angle) * 1.5) + spacecraft.velocity_y, spacecraft.angle, 0, planet);
-      nukes.push(nuke);
-    }
+    const nuke = new Nuke(spacecraft.x, spacecraft.y, (Math.sin(spacecraft.angle) * 1.5) + spacecraft.velocity_x, (-Math.cos(spacecraft.angle) * 1.5) + spacecraft.velocity_y, spacecraft.angle, 0, planet);
+    nukes.push(nuke);
   }
 
   function handleKeyDown(event) {
+    // Prevent Enter key from being processed in tutorial mode
+    if (isTutorial && (event.code === "Enter" || event.key === "Enter")) {
+      // Ignore Enter key in tutorial mode
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    
     switch (event.code) {
       case "ArrowLeft":
         spacecraft.angular_velocity -= 0.01;
@@ -78,6 +116,10 @@ export function startGame(canvas, ctx, navigate, options = {}) {
         spacecraft.speed -= 0.1;
         break;
       case "Space":
+        // In tutorial, prevent spacebar from triggering other events
+        if (isTutorial) {
+          event.stopPropagation();
+        }
         fireNuke(spacecraft);
         break;
       default:
@@ -240,7 +282,12 @@ export function startGame(canvas, ctx, navigate, options = {}) {
       spacecraft.y = planet.y + 200;
       spacecraft.velocity_x = 1.3;
       spacecraft.velocity_y = 0;
-      gameOver = true;
+      if (!isTutorial) {
+        gameOver = true;
+      } else {
+        // In tutorial mode, just reset the spacecraft
+        resetSpacecraft();
+      }
     }
 
     // Update nukes
@@ -351,7 +398,9 @@ export function startGame(canvas, ctx, navigate, options = {}) {
       if (areCirclesColliding(planet, asteroid1)) {
         asteroids.splice(i, 1);
         i--;
-        gameOver = true;
+        if (!isTutorial) {
+          gameOver = true;
+        }
       }
     }
   }
@@ -365,19 +414,13 @@ export function startGame(canvas, ctx, navigate, options = {}) {
       animationFrameId = requestAnimationFrame(loop);
     } else {
       if (isTutorial) {
-        // In tutorial mode, reset everything and continue
-        gameOver = false;
-        resetSpacecraft();
-        nukes = [];
-        asteroids = [];
-        score = 0;
-        lastMeteorShowerTime = 0;
+        resetGame();
         loop(); // Restart the game loop
       } else {
         // In normal game mode, navigate to game over
         cleanup();
         const finalScore = Math.round(score / 100);
-        navigate('/game-over', { state: { finalScore, level } });
+        safeNavigate('/game-over', { state: { finalScore, level } });
       }
     }
   }
