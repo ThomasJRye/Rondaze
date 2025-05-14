@@ -156,7 +156,7 @@ export const LEVELS = {
         },
         asteroids: {
             spawnInterval: 10000,
-            minRadius: 2,
+            minRadius: 8,
             maxRadius: 17,
             spawnRate: 1,
             initialVelocity: {

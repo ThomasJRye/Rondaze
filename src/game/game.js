@@ -1,5 +1,5 @@
 import { applyGravity, atmosphericDrag, areCirclesClose, areCirclesColliding } from "./physics.js";
-import { PLANET, SPACECRAFT, NUKES, ATMOSPHERE_LAYERS, ATMOSPHERE_OPACITY } from './constants.js';
+import {  SPACECRAFT, ATMOSPHERE_LAYERS, ATMOSPHERE_OPACITY } from './constants.js';
 import { Nuke, Asteroid } from "./models.js";
 import { LEVELS, TUTORIAL_LEVELS } from "./levels.js";
 
@@ -62,21 +62,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     asteroids = [];
     score = 0;
     lastMeteorShowerTime = 0;
-    
-    // Recreate initial asteroids for level 3
-    if (isTutorial && level === 3 && levelConfig.asteroids.initialAsteroids) {
-      levelConfig.asteroids.initialAsteroids.forEach(asteroidConfig => {
-        const asteroid = new Asteroid(
-          asteroidConfig.x,
-          asteroidConfig.y,
-          asteroidConfig.velocity_x,
-          asteroidConfig.velocity_y,
-          planet,
-          levelConfig.asteroids.minRadius
-        );
-        asteroids.push(asteroid);
-      });
-    }
+  
   }
 
   function resetSpacecraft() {
@@ -89,7 +75,17 @@ export function startGame(canvas, ctx, navigate, options = {}) {
   }
 
   function fireNuke(spacecraft) {
-    const nuke = new Nuke(spacecraft.x, spacecraft.y, (Math.sin(spacecraft.angle) * 1.5) + spacecraft.velocity_x, (-Math.cos(spacecraft.angle) * 1.5) + spacecraft.velocity_y, spacecraft.angle, 0, planet);
+    // Increase velocity by 75% (x1.75)
+    const velocityMultiplier = 1.75;
+    const nuke = new Nuke(
+        spacecraft.x, 
+        spacecraft.y, 
+        (Math.sin(spacecraft.angle) * 1.5 * velocityMultiplier) + spacecraft.velocity_x, 
+        (-Math.cos(spacecraft.angle) * 1.5 * velocityMultiplier) + spacecraft.velocity_y, 
+        spacecraft.angle, 
+        0, 
+        planet
+    );
     nukes.push(nuke);
   }
 

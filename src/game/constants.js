@@ -30,7 +30,7 @@ export const NUKES = {
 export const ASTEROIDS = {
     MASS: 1,
     VELOCITY_MULTIPLIER: 2,
-    COLOR: "#333333",
+    COLOR: "#A0A0A0",
 };
 
 
