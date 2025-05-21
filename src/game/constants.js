@@ -21,16 +21,16 @@ export const NUKES = {
     VELOCITY_MULTIPLIER: 1.5,
     RADIUS: 4,
     FUSE: 400, // Fuse length in frames
-    COLOR: "#4B5320",
+    COLOR: "var(--oxford-blue)",
     BOOM_RADIUS: 56,
-    BOOM_COLOR: "#FF0000",
+    BOOM_COLOR: "var(--vermilion)",
 };
 
 // Asteroid-specific constants
 export const ASTEROIDS = {
     MASS: 1,
     VELOCITY_MULTIPLIER: 2,
-    COLOR: "#A0A0A0",
+    COLOR: "var(--battleship-gray)",
 };
 
 

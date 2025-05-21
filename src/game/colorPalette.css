@@ -1,0 +1,33 @@
+/* CSS HEX */
+:root {
+  --oxford-blue: #0e172cff;
+  --vermilion: #ef3e36ff;
+  --orange-web: #ffae03ff;
+  --battleship-gray: #848c8eff;
+  --white-smoke: #f1f2eeff;
+}
+
+:root {
+  /* Base Colors */
+  --oxford-blue: #0e172c;
+  --vermilion: #ef3e36;
+  --orange-web: #ffae03;
+  --battleship-gray: #848c8e;
+  --white-smoke: #f1f2ee;
+
+  /* Gradients */
+  --gradient-top: linear-gradient(0deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+  --gradient-right: linear-gradient(90deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+  --gradient-bottom: linear-gradient(180deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+  --gradient-left: linear-gradient(270deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+  --gradient-top-right: linear-gradient(45deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+  --gradient-bottom-right: linear-gradient(135deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+  --gradient-top-left: linear-gradient(225deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+  --gradient-bottom-left: linear-gradient(315deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+  --gradient-radial: radial-gradient(var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
+}
+
+.my-element {
+  color: var(--oxford-blue);
+  background: var(--gradient-radial);
+}

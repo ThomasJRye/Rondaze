@@ -4,7 +4,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0px;
-    background-color: #111;
+    background-color: var(--oxford-blue);
 }
 
 #root {

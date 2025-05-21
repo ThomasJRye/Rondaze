@@ -1,8 +1,8 @@
 /* src/StartScreen.css */
 .start-screen {
     display: flex;
-    background-color: black;
-    color: white;
+    background-color: var(--oxford-blue);
+    color: var(--white-smoke);
     height: 100%;
     align-items: center;
     justify-content: center;
@@ -28,7 +28,7 @@
 .highscores-button {
     padding: 15px 30px;
     font-size: 1.5rem;
-    color: white;
+    color: var(--white-smoke);
     border: none;
     border-radius: 10px;
     cursor: pointer;
@@ -36,25 +36,28 @@
 }
 
 .start-button {
-    background-color: #1e90ff;
+    background-color: var(--vermilion);
 }
 
 .tutorial-button {
-    background-color: #1e90ff;
+    background-color: var(--orange-web);
 }
 
 .highscores-button {
-    background-color: #9932CC;
+    background-color: var(--battleship-gray);
 }
 
 .start-button:hover {
-    background-color: #4682b4;
+    background-color: var(--vermilion);
+    opacity: 0.9;
 }
 
 .tutorial-button:hover {
-    background-color: #45a049;
+    background-color: var(--orange-web);
+    opacity: 0.9;
 }
 
 .highscores-button:hover {
-    background-color: #8B008B;
+    background-color: var(--battleship-gray);
+    opacity: 0.9;
 }

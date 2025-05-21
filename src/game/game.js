@@ -178,7 +178,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.font = "50px Arial";
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "var(--white-smoke)";
     ctx.fillText(Math.round(score / 100), 10, 80);
 
     // Draw atmosphere
@@ -196,9 +196,18 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     // Draw the planet
     ctx.beginPath();
     ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
-    ctx.fillStyle = planet.color;
+    ctx.fillStyle = planet.color
+
     ctx.fill();
 
+    ctx.beginPath();
+    ctx.moveTo(planet.x + planet.radius * 0.5, planet.y - planet.radius * 0.3);
+    ctx.lineTo(planet.x + planet.radius * 0.7, planet.y + planet.radius * 0.2);
+    ctx.lineTo(planet.x + planet.radius * 0.3, planet.y + planet.radius * 0.4);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.fill();
+    
     if (arrowUpPressed) {
       ctx.save();
       ctx.translate(spacecraft.x, spacecraft.y);
@@ -208,7 +217,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
       ctx.lineTo(0, spacecraft.radius + 30);
       ctx.lineTo(spacecraft.radius, spacecraft.radius + 10);
       ctx.closePath();
-      ctx.fillStyle = "orange";
+      ctx.fillStyle = "var(--orange-web)";
       ctx.fill();
       ctx.restore();
     }
@@ -222,7 +231,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     ctx.lineTo(-spacecraft.radius, spacecraft.radius + 10);
     ctx.lineTo(spacecraft.radius, spacecraft.radius + 10);
     ctx.closePath();
-    ctx.fillStyle = "maroon";
+    ctx.fillStyle = "var(--vermilion)";
     ctx.fill();
     ctx.restore();
 
@@ -313,7 +322,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
       }
 
       // If the nuke is activated, remove asteroids within the blast radius
-      if (nukes[i] == undefined || nukes[i].activated == undefined) {
+      if (nukes[i] === undefined || nukes[i].activated === undefined) {
         continue;
       }
       if (nukes[i].activated) {
