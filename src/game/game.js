@@ -32,6 +32,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
   let asteroids = [];
   let arrowUpPressed = false;
   let lastMeteorShowerTime = 0;
+  let asteroidCounter = 0;
   let animationFrameId = null;
   
   // Event listener references for cleanup
@@ -74,7 +75,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     asteroids = [];
     score = 0;
     lastMeteorShowerTime = 0;
-  
+    asteroidCounter = 0;
   }
 
   function resetSpacecraft() {
@@ -166,7 +167,8 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     if (isTutorial) return;
 
     const currentTime = Date.now();
-    if (currentTime - lastMeteorShowerTime > levelConfig.asteroids.spawnInterval) {
+    if (currentTime - lastMeteorShowerTime > (levelConfig.asteroids.spawnInterval * (0.95**asteroidCounter))) {
+      
       lastMeteorShowerTime = currentTime;
 
         var xpos = window.innerWidth;
@@ -183,6 +185,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
         const radius = (Math.random() * (levelConfig.asteroids.maxRadius - levelConfig.asteroids.minRadius)) + levelConfig.asteroids.minRadius;
         const asteroid = new Asteroid(xpos, ypos, velocity_x, velocity_y, planet, radius);
         asteroids.push(asteroid);
+        asteroidCounter += 1;
     }
   }
 
