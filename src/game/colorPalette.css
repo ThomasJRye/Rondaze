@@ -15,6 +15,10 @@
   --battleship-gray: #848c8e;
   --white-smoke: #f1f2ee;
 
+  /* Planet Continent Colors */
+  --continent-green-light: rgb(80, 118, 17);
+  --continent-green-dark: rgb(23, 91, 18);
+
   /* Gradients */
   --gradient-top: linear-gradient(0deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));
   --gradient-right: linear-gradient(90deg, var(--oxford-blue), var(--vermilion), var(--orange-web), var(--battleship-gray), var(--white-smoke));

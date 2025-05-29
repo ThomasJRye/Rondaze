@@ -3,6 +3,17 @@ import {  SPACECRAFT, ATMOSPHERE_LAYERS, ATMOSPHERE_OPACITY } from './constants.
 import { Nuke, Asteroid } from "./models.js";
 import { LEVELS, TUTORIAL_LEVELS } from "./levels.js";
 
+// Color palette that mirrors colorPalette.css for canvas use
+const COLORS = {
+  oxfordBlue: '#0e172c',
+  vermilion: '#ef3e36',
+  orangeWeb: '#ffae03',
+  battleshipGray: '#848c8e',
+  whiteSmoke: '#f1f2ee',
+  continentGreenLight: 'rgb(80, 118, 17)',
+  continentGreenDark: 'rgb(23, 91, 18)'
+};
+
 // Initialize canvas
 var score = 0;
 
@@ -158,7 +169,6 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     if (currentTime - lastMeteorShowerTime > levelConfig.asteroids.spawnInterval) {
       lastMeteorShowerTime = currentTime;
 
-      for (let i = 0; i < levelConfig.asteroids.spawnRate; i++) {
         var xpos = window.innerWidth;
         var ypos = window.innerHeight;
         var velocity_x = Math.random() * levelConfig.asteroids.initialVelocity.x;
@@ -173,7 +183,6 @@ export function startGame(canvas, ctx, navigate, options = {}) {
         const radius = (Math.random() * (levelConfig.asteroids.maxRadius - levelConfig.asteroids.minRadius)) + levelConfig.asteroids.minRadius;
         const asteroid = new Asteroid(xpos, ypos, velocity_x, velocity_y, planet, radius);
         asteroids.push(asteroid);
-      }
     }
   }
 
@@ -183,7 +192,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.font = "50px Arial";
-    ctx.fillStyle = "var(--white-smoke)";
+    ctx.fillStyle = COLORS.whiteSmoke;
     ctx.fillText(Math.round(score / 100), 10, 80);
 
     // Draw atmosphere
@@ -205,25 +214,56 @@ export function startGame(canvas, ctx, navigate, options = {}) {
 
     ctx.fill();
 
+    // Draw first continent (upper right)
     ctx.beginPath();
     ctx.moveTo(planet.x + planet.radius * 0.5, planet.y - planet.radius * 0.3);
-    ctx.lineTo(planet.x + planet.radius * 0.7, planet.y + planet.radius * 0.2);
+    ctx.lineTo(planet.x + planet.radius * 0.8, planet.y - planet.radius * 0.1);
+    ctx.lineTo(planet.x + planet.radius * 0.9, planet.y + planet.radius * 0.3);
+    ctx.lineTo(planet.x + planet.radius * 0.7, planet.y + planet.radius * 0.5);
     ctx.lineTo(planet.x + planet.radius * 0.3, planet.y + planet.radius * 0.4);
+    ctx.lineTo(planet.x + planet.radius * 0.1, planet.y - planet.radius * 0.9);
+    ctx.lineTo(planet.x + planet.radius * 0.2, planet.y - planet.radius * 0.6);
     ctx.closePath();
-    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.fillStyle = COLORS.continentGreenLight;
+    ctx.fill();
+
+    // Draw second continent (lower left)
+    ctx.beginPath();
+    ctx.moveTo(planet.x - planet.radius * 0.6, planet.y + planet.radius * 0.1);
+    ctx.lineTo(planet.x - planet.radius * 0.9, planet.y + planet.radius * 0.2);
+    ctx.lineTo(planet.x - planet.radius * 0.8, planet.y + planet.radius * 0.7);
+    ctx.lineTo(planet.x - planet.radius * 0.3, planet.y + planet.radius * 0.8);
+    ctx.lineTo(planet.x - planet.radius * 0.1, planet.y + planet.radius * 0.6);
+    ctx.lineTo(planet.x - planet.radius * 0.3, planet.y + planet.radius * 0.5);
+    
+    ctx.lineTo(planet.x - planet.radius * 0.5, planet.y + planet.radius * 0.1);
+    ctx.closePath();
+    ctx.fillStyle = COLORS.continentGreenDark;
     ctx.fill();
     
     if (arrowUpPressed) {
       ctx.save();
       ctx.translate(spacecraft.x, spacecraft.y);
       ctx.rotate(spacecraft.angle);
+      
+      // Left engine flame
       ctx.beginPath();
-      ctx.moveTo(-spacecraft.radius, spacecraft.radius + 10);
-      ctx.lineTo(0, spacecraft.radius + 30);
-      ctx.lineTo(spacecraft.radius, spacecraft.radius + 10);
+      ctx.moveTo(-spacecraft.radius * 0.3, spacecraft.radius + 8);
+      ctx.lineTo(-spacecraft.radius * 0.15, spacecraft.radius + 25);
+      ctx.lineTo(-spacecraft.radius * 0.05, spacecraft.radius + 8);
       ctx.closePath();
-      ctx.fillStyle = "var(--orange-web)";
+      ctx.fillStyle = COLORS.orangeWeb;
       ctx.fill();
+      
+      // Right engine flame
+      ctx.beginPath();
+      ctx.moveTo(spacecraft.radius * 0.3, spacecraft.radius + 8);
+      ctx.lineTo(spacecraft.radius * 0.15, spacecraft.radius + 25);
+      ctx.lineTo(spacecraft.radius * 0.05, spacecraft.radius + 8);
+      ctx.closePath();
+      ctx.fillStyle = COLORS.orangeWeb;
+      ctx.fill();
+      
       ctx.restore();
     }
 
@@ -231,13 +271,55 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     ctx.save();
     ctx.translate(spacecraft.x, spacecraft.y);
     ctx.rotate(spacecraft.angle);
+    
+    // Draw main spacecraft body
     ctx.beginPath();
-    ctx.moveTo(0, -spacecraft.radius);
-    ctx.lineTo(-spacecraft.radius, spacecraft.radius + 10);
-    ctx.lineTo(spacecraft.radius, spacecraft.radius + 10);
+    ctx.moveTo(0, -spacecraft.radius * 1.2);
+    ctx.lineTo(-spacecraft.radius * 0.8, spacecraft.radius * 0.5);
+    ctx.lineTo(-spacecraft.radius * 0.3, spacecraft.radius + 8);
+    ctx.lineTo(spacecraft.radius * 0.3, spacecraft.radius + 8);
+    ctx.lineTo(spacecraft.radius * 0.8, spacecraft.radius * 0.5);
     ctx.closePath();
-    ctx.fillStyle = "var(--vermilion)";
+    ctx.fillStyle = COLORS.vermilion;
     ctx.fill();
+    
+    // Draw cockpit/nose cone
+    ctx.beginPath();
+    ctx.moveTo(0, -spacecraft.radius * 1.2);
+    ctx.lineTo(-spacecraft.radius * 0.4, -spacecraft.radius * 0.2);
+    ctx.lineTo(spacecraft.radius * 0.4, -spacecraft.radius * 0.2);
+    ctx.closePath();
+    ctx.fillStyle = COLORS.whiteSmoke;
+    ctx.fill();
+    
+    // Draw wing details
+    ctx.beginPath();
+    ctx.moveTo(-spacecraft.radius * 0.8, spacecraft.radius * 0.5);
+    ctx.lineTo(-spacecraft.radius * 1.1, spacecraft.radius * 0.8);
+    ctx.lineTo(-spacecraft.radius * 0.6, spacecraft.radius * 0.9);
+    ctx.closePath();
+    ctx.fillStyle = COLORS.battleshipGray;
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.moveTo(spacecraft.radius * 0.8, spacecraft.radius * 0.5);
+    ctx.lineTo(spacecraft.radius * 1.1, spacecraft.radius * 0.8);
+    ctx.lineTo(spacecraft.radius * 0.6, spacecraft.radius * 0.9);
+    ctx.closePath();
+    ctx.fillStyle = COLORS.battleshipGray;
+    ctx.fill();
+    
+    // Draw engine exhaust ports
+    ctx.beginPath();
+    ctx.arc(-spacecraft.radius * 0.2, spacecraft.radius + 6, 2, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.oxfordBlue;
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(spacecraft.radius * 0.2, spacecraft.radius + 6, 2, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.oxfordBlue;
+    ctx.fill();
+    
     ctx.restore();
 
     // Draw nukes
