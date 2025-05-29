@@ -16,6 +16,7 @@ export function startGame(canvas, ctx, navigate, options = {}) {
   score = 0;
 
   let gameOver = false;
+  let paused = false;
   let nukes = [];
   let asteroids = [];
   let arrowUpPressed = false;
@@ -117,6 +118,10 @@ export function startGame(canvas, ctx, navigate, options = {}) {
           event.stopPropagation();
         }
         fireNuke(spacecraft);
+        break;
+      case "KeyP":
+      case "p":
+        paused = !paused;
         break;
       default:
         break;
@@ -413,9 +418,22 @@ export function startGame(canvas, ctx, navigate, options = {}) {
   // Game loop
   function loop() {
     if (!gameOver) {
-      generateAsteroid();
+      if (!paused) {
+        generateAsteroid();
+        update();
+      }
       draw();
-      update();
+      
+      // Draw pause indicator
+      if (paused) {
+        ctx.font = "40px Arial";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.textAlign = "center";
+        ctx.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
+        ctx.fillText("Press P to resume", canvas.width / 2, canvas.height / 2 + 50);
+        ctx.textAlign = "left"; // Reset text alignment
+      }
+      
       animationFrameId = requestAnimationFrame(loop);
     } else {
       if (isTutorial) {
