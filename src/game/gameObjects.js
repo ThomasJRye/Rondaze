@@ -165,66 +165,23 @@ export function createGameObjects(planet, levelConfig) {
         asteroid2.velocity_x -= force_x / asteroid2.mass;
         asteroid2.velocity_y -= force_y / asteroid2.mass;
 
-        // Bounce or combine if collision
+        // Combine if collision
         if (distance < asteroid1.radius + asteroid2.radius) {
-          // 50% chance to bounce instead of combine
-          if (Math.random() < 0.9) {
-            // Calculate collision normal
-            const nx = dx / distance;
-            const ny = dy / distance;
-            
-            // Calculate relative velocity
-            const relativeVelocityX = asteroid1.velocity_x - asteroid2.velocity_x;
-            const relativeVelocityY = asteroid1.velocity_y - asteroid2.velocity_y;
-            
-            // Calculate relative velocity in terms of the normal direction
-            const velocityAlongNormal = relativeVelocityX * nx + relativeVelocityY * ny;
-            
-            // Do not resolve if velocities are separating
-            if (velocityAlongNormal > 0) {
-              continue;
-            }
-            
-            // Calculate restitution (bounciness)
-            const restitution = 0.1;
-            
-            // Calculate impulse scalar
-            const impulseScalar = -(1 + restitution) * velocityAlongNormal;
-            const impulseX = impulseScalar * nx;
-            const impulseY = impulseScalar * ny;
-            
-            // Apply impulse
-            asteroid1.velocity_x += impulseX;
-            asteroid1.velocity_y += impulseY;
-            asteroid2.velocity_x -= impulseX;
-            asteroid2.velocity_y -= impulseY;
-            
-            // Move asteroids apart to prevent sticking
-            const overlap = (asteroid1.radius + asteroid2.radius) - distance;
-            const moveX = (overlap * nx) / 2;
-            const moveY = (overlap * ny) / 2;
-            
-            asteroid1.x += moveX;
-            asteroid1.y += moveY;
-            asteroid2.x -= moveX;
-            asteroid2.y -= moveY;
-          } else {
-            // Calculate new velocities based on mass-weighted average
-            let new_velocity_x = (asteroid1.velocity_x * asteroid1.mass + asteroid2.velocity_x * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
-            let new_velocity_y = (asteroid1.velocity_y * asteroid1.mass + asteroid2.velocity_y * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
+          // Calculate new velocities based on mass-weighted average
+          let new_velocity_x = (asteroid1.velocity_x * asteroid1.mass + asteroid2.velocity_x * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
+          let new_velocity_y = (asteroid1.velocity_y * asteroid1.mass + asteroid2.velocity_y * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
 
-            // Calculate new position based on mass-weighted average
-            asteroid1.x = (asteroid1.x * asteroid1.mass + asteroid2.x * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
-            asteroid1.y = (asteroid1.y * asteroid1.mass + asteroid2.y * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
-            asteroid1.velocity_x = new_velocity_x;
-            asteroid1.velocity_y = new_velocity_y;
+          // Calculate new position based on mass-weighted average
+          asteroid1.x = (asteroid1.x * asteroid1.mass + asteroid2.x * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
+          asteroid1.y = (asteroid1.y * asteroid1.mass + asteroid2.y * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
+          asteroid1.velocity_x = new_velocity_x;
+          asteroid1.velocity_y = new_velocity_y;
 
-            // Combine masses and scale radius (assuming asteroids are spheres, volume scales with radius^3)
-            asteroid1.mass += asteroid2.mass;
-            asteroid1.radius = Math.pow(Math.pow(asteroid1.radius, 3) + Math.pow(asteroid2.radius, 3), 1/3);
-            
-            asteroids.splice(j, 1);
-          }
+          // Combine masses and calculate new radius using square root of sum of squares
+          asteroid1.mass += asteroid2.mass;
+          asteroid1.radius = Math.sqrt(asteroid1.radius * asteroid1.radius + asteroid2.radius * asteroid2.radius);
+          
+          asteroids.splice(j, 1);
         }
       }
 
