@@ -1,3 +1,14 @@
+// Color palette that mirrors colorPalette.css for canvas use
+export const COLORS = {
+  oxfordBlue: '#0e172c',
+  vermilion: '#ef3e36',
+  orangeWeb: '#ffae03',
+  battleshipGray: '#848c8e',
+  whiteSmoke: '#f1f2ee',
+  continentGreenLight: 'rgb(80, 118, 17)',
+  continentGreenDark: 'rgb(23, 91, 18)'
+};
+
 // Planet-specific constants
 export const PLANET = {
     RADIUS: 25,
