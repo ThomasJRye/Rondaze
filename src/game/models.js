@@ -48,17 +48,12 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
         // Draw the explosion (mushroom cloud)
         ctx.beginPath();
         
-        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.arc(0, 0, this.boom_radius, 0, Math.PI * 2);
 
         // Fill with explosion color
         ctx.fillStyle = NUKES.BOOM_COLOR;
         ctx.fill();
         
-        // Add some smoke detail
-        ctx.beginPath();
-        ctx.arc(0, -this.boom_radius * 0.3, this.boom_radius * 0.2, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.fill();
         
         ctx.restore();
     }
