@@ -14,10 +14,13 @@ export function createGameObjects(planet, levelConfig) {
     if (currentTime - lastMeteorShowerTime > (levelConfig.asteroids.spawnInterval * (0.95**asteroidCounter))) {
       lastMeteorShowerTime = currentTime;
 
+      // Determine number of asteroids to spawn (2, 3, or 3)
+      const clusterRoll = Math.random();
+      const numAsteroids = clusterRoll < 1/9 ? 4 : clusterRoll < 1/3 ? 3 : 2;
+
+      // Base position for the first asteroid
       var xpos = window.innerWidth;
       var ypos = window.innerHeight;
-      var velocity_x = Math.random() * levelConfig.asteroids.initialVelocity.x;
-      var velocity_y = Math.random() * levelConfig.asteroids.initialVelocity.y;
       
       if (Math.random() < 0.5) {
         xpos = xpos * Math.random();
@@ -25,10 +28,28 @@ export function createGameObjects(planet, levelConfig) {
         ypos = ypos * Math.random();
       }
 
-      const radius = (Math.random() * (levelConfig.asteroids.maxRadius - levelConfig.asteroids.minRadius)) + levelConfig.asteroids.minRadius;
-      const asteroid = new Asteroid(xpos, ypos, velocity_x, velocity_y, planet, radius);
-      asteroids.push(asteroid);
-      asteroidCounter += 1;
+      // Spawn the cluster of asteroids
+      for (let i = 0; i < numAsteroids; i++) {
+        // Add slight offset for additional asteroids in the cluster
+        const offsetX = i > 0 ? (Math.random() - 0.5) * 300 : 0;
+        const offsetY = i > 0 ? (Math.random() - 0.5) * 300 : 0;
+
+        const velocity_x = Math.random() * levelConfig.asteroids.initialVelocity.x;
+        const velocity_y = Math.random() * levelConfig.asteroids.initialVelocity.y;
+        const radius = (Math.random() * (levelConfig.asteroids.maxRadius - levelConfig.asteroids.minRadius)) + levelConfig.asteroids.minRadius;
+        
+        const asteroid = new Asteroid(
+          xpos + offsetX, 
+          ypos + offsetY, 
+          velocity_x, 
+          velocity_y, 
+          planet, 
+          radius
+        );
+        asteroids.push(asteroid);
+      }
+      
+      asteroidCounter += numAsteroids;
     }
   }
 
@@ -144,18 +165,66 @@ export function createGameObjects(planet, levelConfig) {
         asteroid2.velocity_x -= force_x / asteroid2.mass;
         asteroid2.velocity_y -= force_y / asteroid2.mass;
 
-        // Combine if collision
+        // Bounce or combine if collision
         if (distance < asteroid1.radius + asteroid2.radius) {
-          let new_velocity_x = (asteroid1.velocity_x * asteroid1.mass + asteroid2.velocity_x * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
-          let new_velocity_y = (asteroid1.velocity_y * asteroid1.mass + asteroid2.velocity_y * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
+          // 50% chance to bounce instead of combine
+          if (Math.random() < 0.9) {
+            // Calculate collision normal
+            const nx = dx / distance;
+            const ny = dy / distance;
+            
+            // Calculate relative velocity
+            const relativeVelocityX = asteroid1.velocity_x - asteroid2.velocity_x;
+            const relativeVelocityY = asteroid1.velocity_y - asteroid2.velocity_y;
+            
+            // Calculate relative velocity in terms of the normal direction
+            const velocityAlongNormal = relativeVelocityX * nx + relativeVelocityY * ny;
+            
+            // Do not resolve if velocities are separating
+            if (velocityAlongNormal > 0) {
+              continue;
+            }
+            
+            // Calculate restitution (bounciness)
+            const restitution = 0.1;
+            
+            // Calculate impulse scalar
+            const impulseScalar = -(1 + restitution) * velocityAlongNormal;
+            const impulseX = impulseScalar * nx;
+            const impulseY = impulseScalar * ny;
+            
+            // Apply impulse
+            asteroid1.velocity_x += impulseX;
+            asteroid1.velocity_y += impulseY;
+            asteroid2.velocity_x -= impulseX;
+            asteroid2.velocity_y -= impulseY;
+            
+            // Move asteroids apart to prevent sticking
+            const overlap = (asteroid1.radius + asteroid2.radius) - distance;
+            const moveX = (overlap * nx) / 2;
+            const moveY = (overlap * ny) / 2;
+            
+            asteroid1.x += moveX;
+            asteroid1.y += moveY;
+            asteroid2.x -= moveX;
+            asteroid2.y -= moveY;
+          } else {
+            // Calculate new velocities based on mass-weighted average
+            let new_velocity_x = (asteroid1.velocity_x * asteroid1.mass + asteroid2.velocity_x * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
+            let new_velocity_y = (asteroid1.velocity_y * asteroid1.mass + asteroid2.velocity_y * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
 
-          asteroid1.x = (asteroid1.x * asteroid1.mass + asteroid2.x * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
-          asteroid1.y = (asteroid1.y * asteroid1.mass + asteroid2.y * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
-          asteroid1.velocity_x = new_velocity_x;
-          asteroid1.velocity_y = new_velocity_y;
+            // Calculate new position based on mass-weighted average
+            asteroid1.x = (asteroid1.x * asteroid1.mass + asteroid2.x * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
+            asteroid1.y = (asteroid1.y * asteroid1.mass + asteroid2.y * asteroid2.mass) / (asteroid1.mass + asteroid2.mass);
+            asteroid1.velocity_x = new_velocity_x;
+            asteroid1.velocity_y = new_velocity_y;
 
-          asteroid1.mass += asteroid2.mass;
-          asteroids.splice(j, 1);
+            // Combine masses and scale radius (assuming asteroids are spheres, volume scales with radius^3)
+            asteroid1.mass += asteroid2.mass;
+            asteroid1.radius = Math.pow(Math.pow(asteroid1.radius, 3) + Math.pow(asteroid2.radius, 3), 1/3);
+            
+            asteroids.splice(j, 1);
+          }
         }
       }
 

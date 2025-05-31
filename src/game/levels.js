@@ -14,8 +14,8 @@ export const TUTORIAL_LEVELS = {
             maxRadius: 0,
             spawnRate: 0,
             initialVelocity: {
-                x: 0,
-                y: 0
+                x: Math.random(),
+                y: Math.random()
             }
         },
         spacecraft: {
