@@ -23,21 +23,67 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
         this.velocity_x = newVelocities.velocity_x;
         this.velocity_y = newVelocities.velocity_y;
 
-        this.angle += this.angularVelocity;
-        this.angularVelocity *= DAMPING_FACTOR;
+        this.angle += this.angular_velocity;
+        this.angular_velocity *= DAMPING_FACTOR;
         this.fuse -= 1;
     };
 
     this.draw = function(ctx) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
+        ctx.translate(/* x */ this.x, /* y */ this.y);
+        ctx.rotate(/* angle */ this.angle);
         
-        // Draw a curcle
+        // Draw a missile-shaped nuke (pointing upward when angle = 0)
         ctx.beginPath();
-        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        
+        // Nose cone (pointed tip)
+        ctx.moveTo(/* x */ 0, /* y */ -this.radius * 2);
+        ctx.lineTo(/* x */ -this.radius * 0.4, /* y */ -this.radius * 0.5);
+        ctx.lineTo(/* x */ this.radius * 0.4, /* y */ -this.radius * 0.5);
+        ctx.closePath();
         ctx.fillStyle = NUKES.COLOR;
         ctx.fill();
+        
+        // Main body (rectangular)
+        ctx.beginPath();
+        ctx.rect(
+            /* x */ -this.radius * 0.4, 
+            /* y */ -this.radius * 0.5, 
+            /* width */ this.radius * 0.8, 
+            /* height */ this.radius * 2
+        );
+        ctx.fillStyle = NUKES.COLOR;
+        ctx.fill();
+        
+        // Tail fins
+        ctx.beginPath();
+        ctx.moveTo(/* x */ -this.radius * 0.4, /* y */ this.radius * 1.5);
+        ctx.lineTo(/* x */ -this.radius * 0.8, /* y */ this.radius * 2);
+        ctx.lineTo(/* x */ -this.radius * 0.4, /* y */ this.radius * 1.8);
+        ctx.closePath();
+        ctx.fillStyle = NUKES.COLOR;
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(/* x */ this.radius * 0.4, /* y */ this.radius * 1.5);
+        ctx.lineTo(/* x */ this.radius * 0.8, /* y */ this.radius * 2);
+        ctx.lineTo(/* x */ this.radius * 0.4, /* y */ this.radius * 1.8);
+        ctx.closePath();
+        ctx.fillStyle = NUKES.COLOR;
+        ctx.fill();
+        
+        // Add a small highlight on the nose to make direction even clearer
+        ctx.beginPath();
+        ctx.arc(
+            /* centerX */ 0, 
+            /* centerY */ -this.radius * 1.5, 
+            /* radius */ this.radius * 0.2, 
+            /* startAngle */ 0, 
+            /* endAngle */ Math.PI * 2
+        );
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.fill();
+        
         ctx.restore();
     };
 
@@ -45,15 +91,19 @@ export function Nuke(x, y, velocity_x, velocity_y, angle, angularVelocity, plane
         ctx.save();
         ctx.translate(this.x, this.y);
         
-        // Draw the explosion (mushroom cloud)
+        // Draw the explosion circle
         ctx.beginPath();
-        
-        ctx.arc(0, 0, this.boom_radius, 0, Math.PI * 2);
+        ctx.arc(
+            /* centerX */ 0, 
+            /* centerY */ 0, 
+            /* radius */ this.boom_radius, 
+            /* startAngle */ 0, 
+            /* endAngle */ Math.PI * 2
+        );
 
         // Fill with explosion color
         ctx.fillStyle = NUKES.BOOM_COLOR;
         ctx.fill();
-        
         
         ctx.restore();
     }
@@ -143,14 +193,26 @@ export function Asteroid(x, y, velocity_x, velocity_y, planet, radius) {
         for (let i = 0; i < this.craters.length; i++) {
             const crater = this.craters[i];
             ctx.beginPath();
-            ctx.arc(crater.x, crater.y, crater.radius, 0, Math.PI * 2);
+            ctx.arc(
+                /* centerX */ crater.x, 
+                /* centerY */ crater.y, 
+                /* radius */ crater.radius, 
+                /* startAngle */ 0, 
+                /* endAngle */ Math.PI * 2
+            );
             ctx.fillStyle = 'rgba(40, 40, 40, 0.6)';
             ctx.fill();
         }
         
         // Add subtle texture/highlights
         ctx.beginPath();
-        ctx.arc(this.radius * 0.2, -this.radius * 0.3, this.radius * 0.1, 0, Math.PI * 2);
+        ctx.arc(
+            /* centerX */ this.radius * 0.2, 
+            /* centerY */ -this.radius * 0.3, 
+            /* radius */ this.radius * 0.1, 
+            /* startAngle */ 0, 
+            /* endAngle */ Math.PI * 2
+        );
         ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.fill();
         

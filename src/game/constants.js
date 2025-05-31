@@ -30,7 +30,7 @@ export const SPACECRAFT = {
 // Nuke-specific constants
 export const NUKES = {
     VELOCITY_MULTIPLIER: 1.5,
-    RADIUS: 4,
+    RADIUS: 5,
     FUSE: 400, // Fuse length in frames
     COLOR: COLORS.battleshipGray,
     BOOM_RADIUS: 56,

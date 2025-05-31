@@ -8,14 +8,26 @@ export function drawPlanet(ctx, planet) {
     let atmosphereColor = planet.atmosphereColor.replace("{opacity}", opacity_for_layer);
 
     ctx.beginPath();
-    ctx.arc(planet.x, planet.y, radius, 0, Math.PI * 2);
+    ctx.arc(
+      /* centerX */ planet.x, 
+      /* centerY */ planet.y, 
+      /* radius */ radius, 
+      /* startAngle */ 0, 
+      /* endAngle */ Math.PI * 2
+    );
     ctx.fillStyle = atmosphereColor;
     ctx.fill();
   }
 
   // Draw the planet
   ctx.beginPath();
-  ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
+  ctx.arc(
+    /* centerX */ planet.x, 
+    /* centerY */ planet.y, 
+    /* radius */ planet.radius, 
+    /* startAngle */ 0, 
+    /* endAngle */ Math.PI * 2
+  );
   ctx.fillStyle = planet.color;
   ctx.fill();
 
@@ -48,8 +60,8 @@ export function drawPlanet(ctx, planet) {
 
 export function drawSpacecraft(ctx, spacecraft, arrowUpPressed) {
   ctx.save();
-  ctx.translate(spacecraft.x, spacecraft.y);
-  ctx.rotate(spacecraft.angle);
+  ctx.translate(/* x */ spacecraft.x, /* y */ spacecraft.y);
+  ctx.rotate(/* angle */ spacecraft.angle);
   
   if (arrowUpPressed) {
     // Left engine flame
@@ -110,12 +122,24 @@ export function drawSpacecraft(ctx, spacecraft, arrowUpPressed) {
   
   // Draw engine exhaust ports
   ctx.beginPath();
-  ctx.arc(-spacecraft.radius * 0.2, spacecraft.radius + 6, 2, 0, Math.PI * 2);
+  ctx.arc(
+    /* centerX */ -spacecraft.radius * 0.2, 
+    /* centerY */ spacecraft.radius + 6, 
+    /* radius */ 2, 
+    /* startAngle */ 0, 
+    /* endAngle */ Math.PI * 2
+  );
   ctx.fillStyle = COLORS.oxfordBlue;
   ctx.fill();
   
   ctx.beginPath();
-  ctx.arc(spacecraft.radius * 0.2, spacecraft.radius + 6, 2, 0, Math.PI * 2);
+  ctx.arc(
+    /* centerX */ spacecraft.radius * 0.2, 
+    /* centerY */ spacecraft.radius + 6, 
+    /* radius */ 2, 
+    /* startAngle */ 0, 
+    /* endAngle */ Math.PI * 2
+  );
   ctx.fillStyle = COLORS.oxfordBlue;
   ctx.fill();
   
@@ -125,14 +149,26 @@ export function drawSpacecraft(ctx, spacecraft, arrowUpPressed) {
 export function drawScore(ctx, score) {
   ctx.font = "50px Arial";
   ctx.fillStyle = COLORS.whiteSmoke;
-  ctx.fillText(Math.round(score / 100), 10, 80);
+  ctx.fillText(
+    /* text */ Math.round(score / 100), 
+    /* x */ 10, 
+    /* y */ 80
+  );
 }
 
 export function drawPauseScreen(ctx, canvas) {
   ctx.font = "40px Arial";
   ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
   ctx.textAlign = "center";
-  ctx.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
-  ctx.fillText("Press P to resume", canvas.width / 2, canvas.height / 2 + 50);
+  ctx.fillText(
+    /* text */ "PAUSED", 
+    /* x */ canvas.width / 2, 
+    /* y */ canvas.height / 2
+  );
+  ctx.fillText(
+    /* text */ "Press P to resume", 
+    /* x */ canvas.width / 2, 
+    /* y */ canvas.height / 2 + 50
+  );
   ctx.textAlign = "left"; // Reset text alignment
 } 
