@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { startGame } from './game/game.js';
 import './GameLoader.css';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const GameLoader = () => {
     const canvasRef = useRef(null);
     const [showInfo, setShowInfo] = useState(true);
     const [score, setScore] = useState(0);
     const navigate = useNavigate();
-    const location = useLocation();
 
     useEffect(() => {
         const handleKeyDown = (event) => {

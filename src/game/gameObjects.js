@@ -16,7 +16,7 @@ export function createGameObjects(planet, levelConfig) {
 
       // Determine number of asteroids to spawn (2, 3, or 3)
       const clusterRoll = Math.random();
-      const numAsteroids = clusterRoll < 1/9 ? 4 : clusterRoll < 1/3 ? 3 : 2;
+      const numAsteroids = clusterRoll < 1/9 ? 3: clusterRoll < 1/3 ? 2 : 1;
 
       // Base position for the first asteroid
       var xpos = window.innerWidth;
