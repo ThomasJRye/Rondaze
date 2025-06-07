@@ -36,28 +36,40 @@
 }
 
 .start-button {
-    background-color: var(--vermilion);
+    background-color: var(--neon-turquise);
+    color: black
 }
 
 .tutorial-button {
-    background-color: var(--orange-web);
+    background-color: var(--neon-turquise);
+    color: black
 }
 
 .highscores-button {
-    background-color: var(--battleship-gray);
+    background-color: var(--neon-turquise);
+    color: black
+}
+
+.start-title {
+    color: var(--neon-turquise);
 }
 
 .start-button:hover {
-    background-color: var(--vermilion);
+    background-color: var(--oxford-blue);
+    color: white;
     opacity: 0.9;
 }
 
+
+
 .tutorial-button:hover {
-    background-color: var(--orange-web);
+    background-color: var(--oxford-blue);
+    color: white;
     opacity: 0.9;
 }
 
 .highscores-button:hover {
-    background-color: var(--battleship-gray);
-    opacity: 0.9;
+    background-color: var(--oxford-blue);
+    color: white;
+    opacity: 0.9
 }

@@ -5,6 +5,7 @@ import GameLoader from "./GameLoader";
 import HighScores from "./HighScores";
 import Tutorial from "./Tutorial";
 import './App.css';
+import './game/colorPalette.css';
 
 function App() {
   
