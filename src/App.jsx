@@ -8,8 +8,6 @@ import './App.css';
 import './game/colorPalette.css';
 
 function App() {
-  
-
   return (
     <BrowserRouter>
     <Routes>
