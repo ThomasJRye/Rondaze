@@ -20,6 +20,14 @@ export function startGame(canvas, ctx, navigate, options = {}) {
   let paused = false;
   let animationFrameId = null;
 
+  // Create background stars
+  const stars = Array(150).fill().map(() => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 1.5 + 0.5,
+    opacity: Math.random() * 0.3 + 0.1
+  }));
+
   const planet = {
     x: canvas.width / 2,
     y: canvas.height / 2,
@@ -87,9 +95,24 @@ export function startGame(canvas, ctx, navigate, options = {}) {
     }
   }
 
+  function drawStars() {
+    ctx.save();
+    stars.forEach(star => {
+      ctx.globalAlpha = star.opacity;
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
   function draw() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw background stars first
+    drawStars();
 
     drawScore(ctx, score);
     drawPlanet(ctx, planet);

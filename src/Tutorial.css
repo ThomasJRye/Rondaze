@@ -18,7 +18,7 @@
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(14, 23, 44, 0.9);
+    background-color: black;
     padding: 15px 25px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
@@ -32,7 +32,7 @@
 .tutorial-info h2 {
     font-size: 1.2rem;
     margin: 0 0 8px 0;
-    color: var(--vermilion);
+    color: var(--neon-turquise);
 }
 
 .tutorial-info p {
@@ -56,8 +56,8 @@
 .tutorial-buttons button {
     padding: 8px 16px;
     font-size: 0.9rem;
-    background-color: var(--orange-web);
-    color: var(--white-smoke);
+    background-color: var(--neon-turquise);
+    color: black;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -65,7 +65,6 @@
 }
 
 .tutorial-buttons button:hover {
-    background-color: var(--orange-web);
     opacity: 0.9;
 }
 
