@@ -101,9 +101,6 @@ const HighScores = () => {
             sx={{
               border: 1,
               borderColor: 'var(--battleship-gray)',
-              '& .MuiDataGrid-cell:hover': {
-                color: 'var(--vermilion)',
-              },
               '& .MuiDataGrid-columnHeaders': {
                 backgroundColor: 'var(--oxford-blue)',
                 borderBottom: '2px solid var(--battleship-gray)',
