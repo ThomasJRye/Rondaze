@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './SaveHighScoreModal.css';
-import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:3002/api/highscores';
 
@@ -8,7 +7,6 @@ const SaveHighScoreModal = ({ score, refetch }) => {
     const [name, setName] = useState('');
     const [showModal, setShowModal] = useState(true);
     const [error, setError] = useState('');
-    const navigate = useNavigate();
 
     const handleSave = async () => {
         if (!name.trim()) {
@@ -38,10 +36,6 @@ const SaveHighScoreModal = ({ score, refetch }) => {
         }
     };
 
-    const handleStartGame = () => {
-        navigate('/game'); // Redirect to the GamePage
-    };
-
     const close = async () => {
         // Save the score before closing if name is entered
         if (name.trim()) {
@@ -65,7 +59,6 @@ const SaveHighScoreModal = ({ score, refetch }) => {
                             onChange={(e) => setName(e.target.value)}
                         />
                         <button onClick={handleSave}>Save</button>
-                        <button onClick={handleStartGame}>Retry</button>
                         <button onClick={close}>Cancel</button>
                     </div>
                 </div>

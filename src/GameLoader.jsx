@@ -5,58 +5,64 @@ import { useNavigate } from 'react-router-dom';
 
 const GameLoader = () => {
     const canvasRef = useRef(null);
-    const [shownInfo, setShownInfo] = useState(JSON.parse(localStorage.getItem('shownInfo')) || false);
-
+    const [showInfo, setShowInfo] = useState(true);
     const [score, setScore] = useState(0);
     const navigate = useNavigate();
 
-   
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Enter') {
+                setShowInfo(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     useEffect(() => {
         console.log(score)
     }, [score]);
 
     useEffect(() => {
-        if (shownInfo) {
+        if (!showInfo) {
             const canvas = canvasRef.current;
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d');
 
-                // Resize the canvas to fill the screen
+            // Resize the canvas to fill the screen
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            setScore(startGame(canvas, ctx, navigate));
+
+            const handleResize = () => {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
+            };
 
-                setScore(startGame(canvas, ctx, navigate));
+            const handleGameOver = () => {
+            };
 
-                const handleResize = () => {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                };
+            window.addEventListener("resize", handleResize);
+            window.addEventListener("gameOver", handleGameOver);
 
-                const handleGameOver = () => {
-                };
-
-                window.addEventListener("resize", handleResize);
-                window.addEventListener("gameOver", handleGameOver);
-
-                return () => {
-                    window.removeEventListener("resize", handleResize);
-                    window.removeEventListener("gameOver", handleGameOver);
-                };
-            }
+            return () => {
+                window.removeEventListener("resize", handleResize);
+                window.removeEventListener("gameOver", handleGameOver);
+            };
         }
-    }, [shownInfo, navigate]);
+    }, [showInfo, navigate]);
 
     const handleStartGame = () => {
-        setShownInfo()
-        localStorage.setItem('shownInfo', JSON.stringify(true));
-        setShownInfo(true);
-    
+        setShowInfo(false);
     };
 
     return (
         <div>
-            {!shownInfo ? (
+            {showInfo ? (
                 <div className="info-screen">
                     <h2>Game Instructions</h2>
                     <p>Use the arrow keys for steering.</p>
